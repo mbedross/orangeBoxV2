@@ -17,7 +17,7 @@ import os
 import header
 header.init()
 
-def statusLED(pinNumber, state):
+def LED(pinNumber, state):
     os.system('echo %d > /sys/class/gpio/gpio%d/value' %(state, pinNumber))
     return
 

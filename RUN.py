@@ -14,6 +14,7 @@ RUN.module(inputs)
 
 import socket
 import os
+import os.path
 import time
 import math
 import PRINT
@@ -21,14 +22,14 @@ import SET
 import header
 header.init()
 
-def pump(STOP_pump, continuous):
+def pump():
     """
     This module runs the microfluidic pump on the DHM sample line
     
     Input Variables:
-    STOP_pump = desired time to run the pump in seconds (should be an integer)
-    continuous = logical value to decide if the pump should be run continuously
-                 0 = NOT continuous, else run continuously
+    This function will run as long as there is a pump lock file that exists. It
+    will run the pump and check to see if the lock file exists after every pump cycle.
+    Once the lock file is removed, the pump will be turned off.
                  
     """
     
@@ -42,32 +43,16 @@ def pump(STOP_pump, continuous):
         state = 0
         SET.valve(vNumber, state)
     
-    pumpFreq = 5                                         ## Pump frequency in Hz
-    if continuous == 0:
-        message = "Pump started"
-        PRINT.event(message)
+    lock = True
+
+    while lock != False:
+        os.system('echo "1" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
+        time.sleep(0.2)
+        os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
+        time.sleep(0.2)
+        lock = os.path.isfile(header.pumpLock)
         
-        totalCount = math.floor(STOP_pump*pumpFreq)
-        count = 1
-        while (count < totalCount):
-            os.system('echo "1" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
-            time.sleep(0.03)
-            os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
-            time.sleep(0.03)
-            count = count + 1
-        
-        message = "Pump Stopped"
-        PRINT.event(message)
-        
-    else:
-        message = "Pump started"
-        PRINT.event(message)
-        
-        while continuous != 0:
-            os.system('echo "1" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
-            time.sleep(0.03)
-            os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
-            time.sleep(0.03)
+    os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
     return
 
 def connectUDP():

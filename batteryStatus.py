@@ -16,6 +16,7 @@ This script should be called as a subprocess by the main python function
 """
 import PRINT
 import RUN
+import SET
 import time
 try:
     import scipy
@@ -52,21 +53,21 @@ while True:
     SoC = (header.batCap-energyRemaining)/header.batCap
     if (SoC > 0.75 and SoC <= 1):
         ## If the battery is between 75-100% SoC, turn the Green LED on
-        os.system('echo 0 > /sys/class/gpio/gpio%d/value' %(header.LEDbatR))
-        os.system('echo 0 > /sys/class/gpio/gpio%d/value' %(header.LEDbatY))
-        os.system('echo 1 > /sys/class/gpio/gpio%d/value' %(header.LEDbatG))
+        SET.LED(header.LEDbatR, 0)
+        SET.LED(header.LEDbatY, 0)
+        SET.LED(header.LEDbatG, 1)
     
     if (SoC > 0.4 and SoC <= 0.75):
         ## If the battery is between 40-75% SoC, turn the Yellow LED on
-        os.system('echo 0 > /sys/class/gpio/gpio%d/value' %(header.LEDbatR))
-        os.system('echo 0 > /sys/class/gpio/gpio%d/value' %(header.LEDbatG))
-        os.system('echo 1 > /sys/class/gpio/gpio%d/value' %(header.LEDbatY))
+        SET.LED(header.LEDbatR, 0)
+        SET.LED(header.LEDbatG, 0)
+        SET.LED(header.LEDbatY, 1)
     
     if (SoC > 0 and SoC <=0.4):
         ## If the battery is between 0-40% SoC, turn the Red LED on
-        os.system('echo 0 > /sys/class/gpio/gpio%d/value' %(header.LEDbatY))
-        os.system('echo 0 > /sys/class/gpio/gpio%d/value' %(header.LEDbatG))
-        os.system('echo 1 > /sys/class/gpio/gpio%d/value' %(header.LEDbatR))
+        SET.LED(header.LEDbatG, 0)
+        SET.LED(header.LEDbatY, 0)
+        SET.LED(header.LEDbatR, 1)
     
     if SoC < 0.05:
         ## The battery has <=5% battery left. Send a message to host server and shut down

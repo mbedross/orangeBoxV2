@@ -14,24 +14,23 @@ import GET
 
 """
 
-import time
-import datetime
 import header
+header.init()
 import math
 
-def time_stamp():
-    ts = time.time()
-    st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S %Y.%m.%d')
-    return (st, ts)
-
-def powerRelay(relayNumber):
-    if relayNumber == header.laserRelay:
-        relayState = header.statusLaser
-    if relayNumber == header.pumpRelay:
-        relayState == header.statusPump
+def relay(relayNumber):
+    relayState = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(relayNumber))
     return (relayState)
 
-def temp_read():
+def pump():
+    lock = os.path.isfile(header.pumpLock)
+    if lock == True:
+        pump = 1
+    else:
+        pump = 0
+    return pump
+
+def temp():
     
     ## Read temp sensors
     header.Temp[0] = int(open(header.temp1).read())

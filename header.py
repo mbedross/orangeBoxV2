@@ -15,13 +15,16 @@ import ntplib
 import os
 
 def init():
-    global filefolder, codefolder, GPIOfolder
+    global filefolder, codefolder, GPIOfolder, pumpLock, camLock
     ## Identify eventlog directory
     filefolder = '/home/odroid/Desktop/BRUIEdhm_os/EventLog'
     ## Identify subroutine direcotry
     codefolder = '/home/odroid/Desktop/BRUIEdhm_os/FINAL'
     ## Identify folder for GPIO files
     GPIOfolder = '/usr/bin'
+    ## Hardware lock files
+    pumpLock = '/home/odroid/Desktop/BRUIEdhm_os/pumpLock.tmp'
+    camLock = '/home/odroid/Desktop/BRUIEdhm_os/camLock.tmp'
     
     ## GPIO Pin export numbers
     global laserPower, pumpRelay, EMsc, laserRelay, valve1, valve2, valve3, moist1, moist2, moist3, moist4, temp1, temp2, temp3, temp4, batteryV, shuntV
@@ -64,18 +67,32 @@ def init():
     LEDv2 = 8
     LEDv3 = 9
     
+    ## GPIO pins for push buttons
+    global buttonPump, buttonV1_2, buttonV3, buttonQuit, buttonDAQ
+    buttonPump = 1
+    buttonV1_2 = 2
+    buttonV3 = 3
+    buttonQuit = 4
+    buttonDAQ = 5
+    
     ## Status variables
     global statusLaser, statusCam, statusPump, statusV1, statusV1, statusV2, statusV3, statusM1, statusM2, statusM3, statusM4
     statusLaser = 0                  ## Laser status variable
     statusCam = 0                    ## Camera status variable
-    statusPump = 0                   ## Pump status variable
-    statusV1 = 0                     ## Valve1 status variable
-    statusV2 = 0                     ## Valve2 status variable
-    statusV3 = 0                     ## Valve3 status variable
-    statusM1 = 0                     ## Moist1 status variable 
-    statusM2 = 0                     ## Moist2 status variable 
-    statusM3 = 0                     ## Moist3 status variable 
-    statusM4 = 0                     ## Moist4 status variable 
+    
+    ## Checking the status of the pump requires checking to see if the
+    ## pumpLock file exists
+    statusPump = os.path.isfile(header.pumpLock)
+    
+    ## Checking the status of the valve/moisture sensors requires checking the 
+    ##GPIO pins associated with them
+    statusV1 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.valve1))
+    statusV2 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.valve2))
+    statusV3 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.valve3))
+    statusM1 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist1))
+    statusM2 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist2))
+    statusM3 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist3))
+    statusM4 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist4))
     
     ## Misc. Global variables
     global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap
@@ -93,7 +110,7 @@ def init():
     Temp = [0, 0, 0, 0, 0]             ## Variable to store temperatures
     Rshunt = 0.75                     ## Resistance of shunt resistor
     batCap = 100                      ## total usable battery capacity in Ah
-
+    
 def defineGPIO():
     ## Establish all LED pins as GPIO outputs
     os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDbatG))
@@ -106,7 +123,14 @@ def defineGPIO():
     os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDv2))
     os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDv3))
     
-    ## Establish all moisture sensor pins as GPIO inputs and the sensor power pin as output
+    ## Establish all push buttons as GPIO inputs
+    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonPump))
+    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonV1_2))
+    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonV3))
+    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonQuit))
+    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonDAQ))
+    
+    ## Establish all moisture sensor pins as GPIO inputs and the power pin as output
     os.system('echo out > /sys/class/gpio/gpio%d/direction' %(moistPower))
     os.system('echo in > /sys/class/gpio/gpio%d/direction' %(moist1))
     os.system('echo in > /sys/class/gpio/gpio%d/direction' %(moist2))
@@ -134,3 +158,7 @@ def syncTime():
         PRINT.event(message)
     return
     
+    def touch(fname, times=None):
+        with open(fname, 'a'):
+            os.utime(fname, times)
+        return
