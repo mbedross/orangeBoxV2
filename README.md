@@ -132,3 +132,21 @@ SET.valve(vNumber, state)
 SET.DAQtime(daqTime)
 SET.powerRelay(relayNumber, state)
 ```
+
+#### SET.LED(pinNumber, state)
+
+This module is used to turn LED's on and off. For the pump and valves of the instrument, this isn't necessary. The LED's for those components are physically wired with the relay that controls them so the LED will always turn on when its respective device is on.
+
+Input variables include the LED pin number (see header.py) and desired state. state = 1 -> ON and state = 0 -> OFF
+
+#### SET.valve(vNumber, state)
+
+This module energizes or de-energizes the relay that controls the microfluidic valves. These valves are Normally Open (NO) and so energizing the coils (state = 1) will CLOSE the valve. vNumber is the valve relay pin number (see header.py)
+
+#### SET.DAQtime(daqTime)
+
+This module sets the length of time that DAQ will occur. The camera is controlled by a lock file so this module changes the time variable that is used to touch and remove the camera lock file.
+
+#### SET.powerRelay(relayNumber, state)
+
+This module energizes of de-energizes relay coils

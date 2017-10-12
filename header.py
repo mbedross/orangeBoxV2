@@ -158,7 +158,7 @@ def syncTime():
         PRINT.event(message)
     return
     
-    def touch(fname, times=None):
-        with open(fname, 'a'):
-            os.utime(fname, times)
-        return
+def touch(fname, times=None):
+    with open(fname, 'a'):
+        os.utime(fname, times)
+    return
