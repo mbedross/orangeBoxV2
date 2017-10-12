@@ -85,8 +85,10 @@ os.remove(header.pumpLock)     ## Remove lock file
 
 This script attempts to connect to an IP address and Port Number defined in the header.py file. The IP and Port numbers are defined as the variable:
 
-* header.UDP_IP
-* header.UDP_PORT
+```
+header.UDP_IP
+header.UDP_PORT
+```
 
 Once connected, the script will send a message to the host UDP server to confirm connection, this message is also defined in the header.py file as header.MESSAGE
 
@@ -102,9 +104,11 @@ This is to be called in emergency situations. This does not wait for programs to
 
 This script contains all modules that query the status of an operation. The modules include:
 
-* GET.relay(relayNumber)
-* GET.pump()
-* GET.temp()
+```
+GET.relay(relayNumber)
+GET.pump()
+GET.temp()
+```
 
 #### GET.relay(relayNumber)
 
@@ -122,8 +126,9 @@ This module checks the temperatures of the five thermistors on the instrument an
 
 This script contains all modules that set the status of an operation. The modules include:
 
-* SET.LED(pinNumber, state)
-* SET.valve(vNumber, state)
-* SET.DAQtime(daqTime)
-* SET.powerRelay(relayNumber, state)
-
+```
+SET.LED(pinNumber, state)
+SET.valve(vNumber, state)
+SET.DAQtime(daqTime)
+SET.powerRelay(relayNumber, state)
+```
