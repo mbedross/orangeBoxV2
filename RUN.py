@@ -63,22 +63,68 @@ def connectUDP():
     DHM sends an intiating message to the host computer
     
     """
-    message = "UDP target IP: %s, UDP target port: %d" % (UDP_IP, UDP_PORT)
+    message = "UDP target IP: %s, UDP target port: %d" % (header.UDP_IP, header.UDP_PORT)
     PRINT.event(message)
     
-    ## Create a UDP socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        ## Create a UDP socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     
-    message = "Socket created: %s:%d" % (header.UDP_IP, header.UDP_PORT)
+        message = "Socket created: %s:%d" % (header.UDP_IP, header.UDP_PORT)
+        PRINT.event(message)
+        PRINT.udp(message)
+    
+        ## Send MESSAGE to verify connection
+        sock.sendto(MESSAGE, (header.UDP_IP, header.UDP_PORT))
+    
+        message = "Initialization message sent over UDP, now awaiting commands..."
+        PRINT.event(message)
+        PRINT.udp(message)
+        header.connected = 1
+    except Exception as e:
+        message = "UDP connection failed with following error:"
+        PRINT.event(message)
+        PRINT.event(e)
+    return
+
+def rampLaserUP():
+    """
+    IMPORTANT!!!
+    
+    This code is TENTATIVE. Must first test if PWM is valid with the laser driver
+    If not, ramping is not possible, must design a voltage divider such that the
+    max output of the GPIO (1.8V) gives the desired optical power desired
+    """
+    t_ramp = 5  ## Time in seconds to ramp up laser
+    v_now=0
+    v_high = 0.394
+    for t in range(0,t_ramp):
+        v_new = v_now+v_high/5
+        os.system('/home/shamu/mcc-libhid/write_DtoA_channel 0 %f' % (v_new))
+        v_now = v_new
+        time.sleep(1)
+    message = "Laser finished ramping UP and is ON"
     PRINT.event(message)
-    PRINT.udp(message)
+    return
+
+def rampLaserDOWN():
+    """
+    IMPORTANT!!!
     
-    ## Send MESSAGE to verify connection
-    sock.sendto(MESSAGE, (header.UDP_IP, header.UDP_PORT))
-    
-    message = "Initialization message sent over UDP, now awaiting commands..."
+    This code is TENTATIVE. Must first test if PWM is valid with the laser driver
+    If not, ramping is not possible, must design a voltage divider such that the
+    max output of the GPIO (1.8V) gives the desired optical power desired
+    """
+    t_ramp = 5  ## Time in seconds to ramp up laser
+    v_now=0.394
+    v_low = 0
+    for t in range(0,t_ramp):
+        v_new = v_now-v_high/t_ramp
+        os.system('/home/shamu/mcc-libhid/write_DtoA_channel 0 %f' % (v_new))
+        v_now = v_new
+        time.sleep(1)
+    message = "Laser finished ramping DOWN and is OFF"
     PRINT.event(message)
-    PRINT.udp(message)
     return
 
 def powerOFF():

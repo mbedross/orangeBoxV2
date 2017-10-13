@@ -12,10 +12,11 @@ Manu's MacBook Pro's IP in the wind tunnel is 192.168.1.14 (port is arbitrary)
 """
 
 import ntplib
+import socket
 import os
 
 def init():
-    global filefolder, codefolder, GPIOfolder, pumpLock, camLock
+    global fileFolder, codeFolder, GPIOfolder, pumpLock, camLock
     ## Identify eventlog directory
     filefolder = '/home/odroid/Desktop/BRUIEdhm_os/EventLog'
     ## Identify subroutine direcotry
@@ -26,14 +27,15 @@ def init():
     pumpLock = '/home/odroid/Desktop/BRUIEdhm_os/pumpLock.tmp'
     camLock = '/home/odroid/Desktop/BRUIEdhm_os/camLock.tmp'
     
-    ## GPIO Pin export numbers
-    global laserPower, pumpRelay, EMsc, laserRelay, valve1, valve2, valve3, moist1, moist2, moist3, moist4, temp1, temp2, temp3, temp4, batteryV, shuntV
+    ## GPIO Pin numbers
+    global laserPower, pumpRelay, EMsc, laserRelay, valve1, valve2, valve3, moist1, moist2, moist3, moist4, temp1, temp2, temp3, temp4, batteryV, shuntV,diodeC
     laserPower = 33                  ## GPIO pin number - Laser optical power
     pumpRelay = 24                   ## GPIO pin number - Pump power relay
     laserRelay = 23                  ## GPIO pin number - Laser exc. power relay
     valve1 = 1                       ## GPIO pin number - Valve 1 relay
     valve2 = 2                       ## GPIO pin number - Valve 2 relay
     valve3 = 3                       ## GPIO pin number - Valve 3 relay
+    relays = [laserPower, pumpRelay, laserRelay, valve1, valve2, valve3]
     moistPower = 1                   ## GPIO moisture sensor power
     moist1 = 1                       ## GPIO moisture sensor 1
     moist2 = 2                       ## GPIO moisture sensor 2
@@ -46,6 +48,7 @@ def init():
     tempSC = [1, 2]                  ## [adcBank, pin] - temp sensor SC
     batteryV = 1
     shuntV = 1
+    diodeC = 1                       ## Arduino ADC pin
     
     
 ## Define file to read for temp pins as analog inputs
@@ -95,7 +98,7 @@ def init():
     statusM4 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist4))
     
     ## Misc. Global variables
-    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap
+    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap, connected
     pumpTime = 10                      ## Pump time to cycle in new sample
     DAQtime = 15                       ## Standard image acq. time in seconds
     ADC = 24
@@ -110,6 +113,19 @@ def init():
     Temp = [0, 0, 0, 0, 0]             ## Variable to store temperatures
     Rshunt = 0.75                     ## Resistance of shunt resistor
     batCap = 100                      ## total usable battery capacity in Ah
+    connected = 0;
+    
+    ## UDP message legend
+    comDAQ = 'DHM_record'                          # Start DAQ
+    comDAQstop = 'DHM_stop'                        # Stop DAQ
+    comStatus = 'DHM_status'                       # Query for DHM status
+    comPumpOn = 'DHM_pumpOn'                       # Turn on pump
+    comPumpOff = 'DHM_pumpOff'                     # Turn off pump
+    comVinlet = 'DHM_invletValve'                  # Switch the sample chamber inlet valve
+    comVoutlet = 'DHM_outletValve'                 # Switch the sample chamber outlet valve
+    comVref = 'DHM_refValve'                       # Switch the reference channel valve
+    comDAQauto = 'DHM_auto'                        # Let DHM run its own cycle
+    comOFF = 'SYS_off'                             # Non-emergency shutdown
     
 def defineGPIO():
     ## Establish all LED pins as GPIO outputs
@@ -158,7 +174,12 @@ def syncTime():
         PRINT.event(message)
     return
     
+<<<<<<< Updated upstream
 def touch(fname, times=None):
+=======
+def touch(fname):
+    times=None
+>>>>>>> Stashed changes
     with open(fname, 'a'):
         os.utime(fname, times)
     return
