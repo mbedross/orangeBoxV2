@@ -63,6 +63,7 @@ if header.connect == 1:
         
         if c in data: # DHM_record 
             ## TO BE WRITTEN
+            RUN.DAQ() ## Placeholder
         
         if header.comStatus in data: # Host queried DHM status
             pump = GET.pump()
@@ -70,15 +71,18 @@ if header.connect == 1:
             temp = GET.temp()
             message = 'Pump status is: ', pump, '\n', 'Relay statuses are: ', relays, '\n', 'Temperatures are : ', temp
             PRINT.udp(message)
-            
-        if header.comPumpOn in data: # pump in new sample
+        
+        if header.comPumpOn in data: # Turn pump on
             header.touch(header.pumpLock)
             RUN.pump()
+        
+        if header.comPumpOff in data: # Turn pump off
+            os.remove(pumpLock)
         
         if f in data: # run microscope on auto
             auto_run()
         
         if z in data: # Non-emergency shutdown
             power_off()
-        else:
-            return
+    else:
+        return

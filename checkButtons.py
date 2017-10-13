@@ -16,6 +16,13 @@ import time
 import header
 header.init()
 
+## Turn GPIO pins for buttons on
+os.system('echo 1 > /sys/class/gpio/gpio%d/value' %(header.buttonPump))
+os.system('echo 1 > /sys/class/gpio/gpio%d/value' %(header.buttonV1_2))
+os.system('echo 1 > /sys/class/gpio/gpio%d/value' %(header.buttonV3))
+os.system('echo 1 > /sys/class/gpio/gpio%d/value' %(header.buttonQuit))
+os.system('echo 1 > /sys/class/gpio/gpio%d/value' %(header.buttonDAQ))
+
 while True:
     ## Begin checking buttons. These buttons should be normally HIGH (LOW if pushed)
     pump = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonPump))
