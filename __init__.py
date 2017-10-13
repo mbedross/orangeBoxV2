@@ -84,5 +84,5 @@ if header.connect == 1:
         
         if z in data: # Non-emergency shutdown
             power_off()
-    else:
-        return
+else:
+    return
