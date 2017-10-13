@@ -174,12 +174,8 @@ def syncTime():
         PRINT.event(message)
     return
     
-<<<<<<< Updated upstream
-def touch(fname, times=None):
-=======
 def touch(fname):
     times=None
->>>>>>> Stashed changes
     with open(fname, 'a'):
         os.utime(fname, times)
     return
