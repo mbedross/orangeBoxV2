@@ -40,7 +40,8 @@ def init():
     relay3 = 3
     relayALL = [relayLaser, relayPump, relayValve1, relayValve2, relayValve3, relayTEC1, relayTEC2, relay2, relay3]
     
-    global moistPower, moist1, moist2, moist3, moist4, temp1, temp2, temp3, temp4, batteryV, shuntV,diodeC
+    global laser, moistPower, moist1, moist2, moist3, moist4, temp1, temp2, temp3, temp4, batteryV, shuntV,diodeC
+    laser = 1
     moistPower = 1                   ## GPIO moisture sensor power
     moist1 = 1                       ## GPIO moisture sensor 1
     moist2 = 2                       ## GPIO moisture sensor 2
@@ -159,12 +160,16 @@ def defineGPIO():
     os.system('echo in > /sys/class/gpio/gpio%d/direction' %(moist4))
     
     ## Establish remaining GPIO pins as appropriate
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(laserPower))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(laserRelay))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(pumpRelay))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(valve1))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(valve2))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(valve3))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(laser))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayLaser))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayPump))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayValve1))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayValve2))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayValve3))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayTEC1))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayTEC2))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relay2))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relay3))
     return
 
 def syncTime():
