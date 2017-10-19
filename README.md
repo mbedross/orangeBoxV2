@@ -14,13 +14,13 @@ This software was written specifically to run on an [UDOO x86 Ultra] (https://ww
 
 A custom PCB is necessary to interface the UDOO with all peripheral devices of the instrument. These devices include:
 
-* Laser driver
-* Microfluidic pump
-* Microfluidic valves
-* TEC temperature controllers
-* Thermistors
+* [Laser driver] (https://www.thorlabs.com/newgrouppage9.cfm?objectgroup_id=1364)
+* [Microfluidic pump] (http://www.theleeco.com/whats-new/lpm-inert-solenoid-pump.cfm)
+* [Microfluidic valves] (http://www.theleeco.com/electro-fluidic-systems/solenoid-valves/lhl/lhl-series-solenoid-valves.cfm)
+* [TEC temperature controllers] (http://www.digikey.com/scripts/DkSearch/dksus.dll?Detail&itemSeq=241420187&uq=636439335205899036)
+* [Thermistors] (https://www.digikey.com/product-detail/en/cantherm/MF52A2103J3470/317-1258-ND/1191033)
 * Moisture sensors
-* LED's
+* [LED's] (https://www.digikey.com/product-detail/en/visual-communications-company-vcc/L65DR2L/L65DR2L-ND/6166297)
 * User input buttons
 
 Please contact mbedross@caltech.edu for a full list of needed parts and custom PCB specifications
@@ -149,4 +149,5 @@ This module sets the length of time that DAQ will occur. The camera is controlle
 
 #### SET.powerRelay(relayNumber, state)
 
-This module energizes of de-energizes relay coils
+This module energizes or de-energizes relay coils. These relays are Single Pole Dual Throw (SPDT). There is one common, one Normally Open (NO), and one Normally Closed (NC) lead. Energizing the coil (state = 1) completes the circuit between the common and NC lead.
+
