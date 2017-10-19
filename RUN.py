@@ -34,25 +34,25 @@ def pump():
     """
     
     ## First make sure all valves are open before pump turns on
-    if header.valve1 == 1:
-        vNumber = header.valve1
+    if header.relayValve1 == 1:
+        vNumber = header.relayValve1
         state = 0
         SET.valve(vNumber, state)
-    if header.valve2 == 1:
-        vNumber = header.valve1
+    if header.relayValve2 == 1:
+        vNumber = header.relayValve2
         state = 0
         SET.valve(vNumber, state)
     
     lock = True
 
     while lock != False:
-        os.system('echo "1" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
+        os.system('echo "1" |sudo tee /sys/class/gpio/gpio%s/value' %(header.relayPump))
         time.sleep(0.2)
-        os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
+        os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.relayPump))
         time.sleep(0.2)
         lock = os.path.isfile(header.pumpLock)
         
-    os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.pumpRelay))
+    os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.relayPump))
     return
 
 def connectUDP():
@@ -128,12 +128,11 @@ def rampLaserDOWN():
     return
 
 def powerOFF():
+    ## Ramp down laser
+    rampLaserDown()
     ## Make sure all valves and power relays are off (valves are normally open)
-    vNumber = [header.valve1, header.valve2, header.valve3]
     state = 0
-    SET.valve(vNumber, state)
-    rNumber = [header.laserRelay, header.pumpRelay]
-    SET.powerRelay(rNumber, state)
+    SET.powerRelay("all", state)
     
     message = "Non-emergency shut down"
     PRINT.event(message)

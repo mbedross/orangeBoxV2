@@ -19,7 +19,11 @@ header.init()
 import math
 
 def relay(relayNumber):
-    relayState = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(relayNumber))
+    if relayNumber == "all":
+        for x in range(0, len(header.relays)-1):
+            relayState[x] = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(relayNumber))
+    else:
+        relayState = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(relayNumber))
     return (relayState)
 
 def pump():
