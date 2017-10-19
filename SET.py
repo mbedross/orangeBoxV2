@@ -21,33 +21,6 @@ def LED(pinNumber, state):
     os.system('echo %d > /sys/class/gpio/gpio%d/value' %(state, pinNumber))
     return
 
-def valve(vNumber, state):
-    """
-    This module operates the valves around the sample chamber. 
-    
-    Input Variables:
-    vNumber = the valve number to be operated (can be scalar or vector for multiple
-              valves). vNumber = header.valveRelayXXX
-    state = desired state of the valve. 0 = open, 1 = closed
-    
-    NOTE: Valves are NORMALLY OPEN (N.O.)
-    """
-    try:
-        for x in range(0, len(vNumber)-1):
-            os.system('echo "%d" |sudo tee /sys/class/gpio/gpio%s/value' %(state, vNumber[x]))
-            statusLED(vnumber[x], state)
-        if state == 0:
-            status = "opened"
-        else:
-            status = "closed"
-        message = "Valve(s)", vNumber, "have been %s" %(status)
-        PRINT.event(message)
-    except Exception as e:
-        message = "Valve %d was unable to be set. Error is as follows:\n" %(vNumber)
-        PRINT.event(message)
-        PRINT.event(e)
-    return
-
 def DAQtime(daqTime):
     try:
         header.DAQtime = daqTime
@@ -61,9 +34,17 @@ def DAQtime(daqTime):
 
 def powerRelay(relayNumber, state):
     try:
+        if relayNumber == "all":
+            for x in range(0, len(header.relayALL)-1):
+                os.system('echo "%d" |sudo tee /sys/class/gpio/gpio%s/value' %(state, header.relayALL[x]))
+            if state == 0:
+                message = "All relays have been turned off"
+            else:
+                message = "All relays have been turned on"
+            PRINT.event(message)
         for x in range(0, len(relayNumber)-1):
             os.system('echo "%d" |sudo tee /sys/class/gpio/gpio%s/value' %(state, relayNumber[x]))
-            if relayNumber[x] == header.laserRelay:
+            if relayNumber[x] == header.relayLaser:
                 header.statusLaser = state
                 if state == 0:
                     message = "The laser has been shut off"
@@ -71,7 +52,7 @@ def powerRelay(relayNumber, state):
                 else:
                     message = "The laser has been turned on"
                     PRINT.event(message)
-            if relayNumber[x] == header.pumpRelay:
+            if relayNumber[x] == header.relayPump:
                 header.statusPump = state
                 if state == 0:
                     message = "The pump has been shut off"

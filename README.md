@@ -150,4 +150,3 @@ This module sets the length of time that DAQ will occur. The camera is controlle
 #### SET.powerRelay(relayNumber, state)
 
 This module energizes or de-energizes relay coils. These relays are Single Pole Dual Throw (SPDT). There is one common, one Normally Open (NO), and one Normally Closed (NC) lead. Energizing the coil (state = 1) completes the circuit between the common and NC lead.
-

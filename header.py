@@ -12,7 +12,6 @@ Manu's MacBook Pro's IP in the wind tunnel is 192.168.1.14 (port is arbitrary)
 """
 
 import ntplib
-import socket
 import os
 
 def init():
@@ -28,14 +27,21 @@ def init():
     camLock = '/home/odroid/Desktop/BRUIEdhm_os/camLock.tmp'
     
     ## GPIO Pin numbers
-    global laserPower, pumpRelay, EMsc, laserRelay, valve1, valve2, valve3, moist1, moist2, moist3, moist4, temp1, temp2, temp3, temp4, batteryV, shuntV,diodeC
-    laserPower = 33                  ## GPIO pin number - Laser optical power
-    pumpRelay = 24                   ## GPIO pin number - Pump power relay
-    laserRelay = 23                  ## GPIO pin number - Laser exc. power relay
-    valve1 = 1                       ## GPIO pin number - Valve 1 relay
-    valve2 = 2                       ## GPIO pin number - Valve 2 relay
-    valve3 = 3                       ## GPIO pin number - Valve 3 relay
-    relays = [laserPower, pumpRelay, laserRelay, valve1, valve2, valve3]
+    ## Relays
+    global relayLaser, relayPump, relayValve1, relayValve2, relayValve3, relayTEC1, relayTEC2, relay2, relay3
+    relayLaser = 33
+    relayPump = 24
+    relayValve1 = 1
+    relayValve2 = 2
+    relayValve3 = 3
+    relayTEC1 = 1
+    relayTEC2 = 2
+    relay2 = 2
+    relay3 = 3
+    relayALL = [relayLaser, relayPump, relayValve1, relayValve2, relayValve3, relayTEC1, relayTEC2, relay2, relay3]
+    
+    global laser, moistPower, moist1, moist2, moist3, moist4, temp1, temp2, temp3, temp4, batteryV, shuntV,diodeC
+    laser = 1
     moistPower = 1                   ## GPIO moisture sensor power
     moist1 = 1                       ## GPIO moisture sensor 1
     moist2 = 2                       ## GPIO moisture sensor 2
@@ -46,12 +52,12 @@ def init():
     temp3 =  [1, 0]                  ## [adcBank, pin] - temp sensor 3
     temp4 =  [1, 1]                  ## [adcBank, pin] - temp sensor 4
     tempSC = [1, 2]                  ## [adcBank, pin] - temp sensor SC
-    batteryV = 1
-    shuntV = 1
-    diodeC = 1                       ## Arduino ADC pin
+    batteryV = 1                     ## ADC for battery voltage
+    shuntV = 1                       ## ADC pin for system power shunt
+    diodeC = 1                       ## Arduino ADC pin for laser diode current
     
     
-## Define file to read for temp pins as analog inputs
+    ## Define file to read for temp pins as analog inputs
     temp1 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp1[0], temp1[1])
     temp2 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp2[0], temp2[1])
     temp3 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp3[0], temp3[1])
@@ -154,12 +160,16 @@ def defineGPIO():
     os.system('echo in > /sys/class/gpio/gpio%d/direction' %(moist4))
     
     ## Establish remaining GPIO pins as appropriate
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(laserPower))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(laserRelay))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(pumpRelay))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(valve1))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(valve2))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(valve3))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(laser))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayLaser))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayPump))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayValve1))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayValve2))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayValve3))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayTEC1))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayTEC2))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relay2))
+    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relay3))
     return
 
 def syncTime():
