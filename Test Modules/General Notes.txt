@@ -1,0 +1,1 @@
+Can the laser driver be given a PWM signal to adjust laser output power?

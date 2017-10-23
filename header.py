@@ -15,74 +15,73 @@ import ntplib
 import os
 
 def init():
-    global fileFolder, codeFolder, GPIOfolder, pumpLock, camLock
+    global fileFolder, codeFolder, pumpLock, camLock
     ## Identify eventlog directory
-    filefolder = '/home/odroid/Desktop/BRUIEdhm_os/EventLog'
+    filefolder = '/home/orangeboxv2/Desktop/EventLogs'
     ## Identify subroutine direcotry
-    codefolder = '/home/odroid/Desktop/BRUIEdhm_os/FINAL'
-    ## Identify folder for GPIO files
-    GPIOfolder = '/usr/bin'
+    codefolder = '/home/orangeboxv2/Documents/holOS/orangeboxv2'
     ## Hardware lock files
-    pumpLock = '/home/odroid/Desktop/BRUIEdhm_os/pumpLock.tmp'
-    camLock = '/home/odroid/Desktop/BRUIEdhm_os/camLock.tmp'
+    pumpLock = '/tmp/pumpLock.tmp'
+    camLock = '/tmp/camLock.tmp'
     
     ## GPIO Pin numbers
     ## Relays
     global relayLaser, relayPump, relayValve1, relayValve2, relayValve3, relayTEC1, relayTEC2, relay2, relay3
-    relayLaser = 33
-    relayPump = 24
-    relayValve1 = 1
-    relayValve2 = 2
+    relayLaser = 346
+    relayPump = 6
+    relayValve1 = 5
+    relayValve2 = 4
     relayValve3 = 3
-    relayTEC1 = 1
-    relayTEC2 = 2
-    relay2 = 2
-    relay3 = 3
+    relayTEC1 = 344
+    relayTEC2 = 351
+    relay2 = 499
+    relay3 = 497
     relayALL = [relayLaser, relayPump, relayValve1, relayValve2, relayValve3, relayTEC1, relayTEC2, relay2, relay3]
     
     global laser, moistPower, moist1, moist2, moist3, moist4, temp1, temp2, temp3, temp4, batteryV, shuntV,diodeC
     laser = 1
-    moistPower = 1                   ## GPIO moisture sensor power
-    moist1 = 1                       ## GPIO moisture sensor 1
-    moist2 = 2                       ## GPIO moisture sensor 2
-    moist3 = 3                       ## GPIO moisture sensor 3
-    moist4 = 4                       ## GPIO moisture sensor 4
-    temp1 =  [0, 4]                  ## [adcBank, pin] - temp sensor 1
-    temp2 =  [0, 5]                  ## [adcBank, pin] - temp sensor 2
-    temp3 =  [1, 0]                  ## [adcBank, pin] - temp sensor 3
-    temp4 =  [1, 1]                  ## [adcBank, pin] - temp sensor 4
-    tempSC = [1, 2]                  ## [adcBank, pin] - temp sensor SC
-    batteryV = 1                     ## ADC for battery voltage
-    shuntV = 1                       ## ADC pin for system power shunt
-    diodeC = 1                       ## Arduino ADC pin for laser diode current
+    moistPower = 330                 ## GPIO moisture sensor power
+    moist1 = 329                     ## GPIO moisture sensor 1
+    moist2 = 332                     ## GPIO moisture sensor 2
+    moist3 = 333                     ## GPIO moisture sensor 3
+    moist4 = 336                     ## GPIO moisture sensor 4
+    tempPower = 2
+    #temp1 =  [0, 4]                  ## [adcBank, pin] - temp sensor 1
+    #temp2 =  [0, 5]                  ## [adcBank, pin] - temp sensor 2
+    #temp3 =  [1, 0]                  ## [adcBank, pin] - temp sensor 3
+    #temp4 =  [1, 1]                  ## [adcBank, pin] - temp sensor 4
+    #tempSC = [1, 2]                  ## [adcBank, pin] - temp sensor SC
+    #batteryV = 1                     ## ADC for battery voltage
+    #shuntV = 1                       ## ADC pin for system power shunt
+    #diodeC = 1                       ## Arduino ADC pin for laser diode current
     
     
     ## Define file to read for temp pins as analog inputs
-    temp1 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp1[0], temp1[1])
-    temp2 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp2[0], temp2[1])
-    temp3 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp3[0], temp3[1])
-    temp4 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp4[0], temp4[1])
-    tempSC = '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(tempSC[0], tempSC[1])
+    #temp1 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp1[0], temp1[1])
+    #temp2 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp2[0], temp2[1])
+    #temp3 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp3[0], temp3[1])
+    #temp4 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp4[0], temp4[1])
+    #tempSC = '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(tempSC[0], tempSC[1])
     
     ## GPIO pins for status LED's
     global LEDbatG, LEDbatY, LEDbatR, LEDbusy, LEDready, LEDpump, LEDv1, LEDv2, LEDv3
-    LEDbatG = 1
-    LEDbatY = 2
-    LEDbatR = 3
-    LEDbusy = 4
-    LEDready = 5
-    LEDpump = 6
-    LEDv1 = 7
-    LEDv2 = 8
-    LEDv3 = 9
+    LEDbatG = 11
+    LEDbatY = 10
+    LEDbatR = 9
+    LEDbusy = 8
+    LEDready = 7
+    LEDpump = 6                      ## Same GPIO pin as relayPump
+    LEDv1 = 5                        ## Same GPIO pin as relayV1
+    LEDv2 = 4                        ## Same GPIO pin as relayV2
+    LEDv3 = 3                        ## Same GPIO pin as relayV3
     
     ## GPIO pins for push buttons
     global buttonPump, buttonV1_2, buttonV3, buttonQuit, buttonDAQ
-    buttonPump = 1
-    buttonV1_2 = 2
-    buttonV3 = 3
-    buttonQuit = 4
-    buttonDAQ = 5
+    buttonPump = 326
+    buttonV1_2 = 347
+    buttonV3 = 349
+    buttonQuit = 350
+    buttonDAQ = 366
     
     ## Status variables
     global statusLaser, statusCam, statusPump, statusV1, statusV1, statusV2, statusV3, statusM1, statusM2, statusM3, statusM4
@@ -134,6 +133,9 @@ def init():
     comOFF = 'SYS_off'                             # Non-emergency shutdown
     
 def defineGPIO():
+    ## Export all GPIO pins so that they are available for access
+    
+    
     ## Establish all LED pins as GPIO outputs
     os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDbatG))
     os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDbatY))
