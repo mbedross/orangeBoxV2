@@ -15,8 +15,8 @@ void setup() {
     pinMode(LED6, OUTPUT);
     pinMode(LED7, OUTPUT);
     pinMode(LED8, OUTPUT);
-    pinMode(LED9, OUTPUT);
-    
+    pinMode(LED9, OUTPUT); 
+   
     // Make sure everything is off
     digitalWrite(tempPower, LOW);
     digitalWrite(relayPump, LOW);

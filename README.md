@@ -122,6 +122,8 @@ This module checks if the pump lock file exists (header.pumpLock). If the file e
 
 This module checks the temperatures of the five thermistors on the instrument and returns their values (in degC) as an array.
 
+These thermistors have a nominal resistance of 10 kOhms at 25 degrees C. To calculate temperature from these Negative Temperature Correlation (NTC) thermistors, the simplified Steinhart-Hart Equation is used. The Beta value for the thermistors used in the instrument is 3470.
+
 ### SET.py
 
 This script contains all modules that set the status of an operation. The modules include:
