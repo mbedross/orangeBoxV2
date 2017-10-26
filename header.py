@@ -1,6 +1,6 @@
 """
 Date Created:       2016.04.06
-Date Last Modified: 2017.09.11
+Date Last Modified: 2017.10.25
 Author: Manuel Bedrossian
 
 This is a header file for the operating system for the 2nd Gen. orangeBox DHM field
@@ -15,6 +15,7 @@ import ntplib
 import os
 
 def init():
+    
     global fileFolder, codeFolder, pumpLock, camLock
     ## Identify eventlog directory
     filefolder = '/home/orangeboxv2/Desktop/EventLogs'
@@ -25,63 +26,56 @@ def init():
     camLock = '/tmp/camLock.tmp'
     
     ## GPIO Pin numbers
-    ## Relays
-    global relayLaser, relayPump, relayValve1, relayValve2, relayValve3, relayTEC1, relayTEC2, relay2, relay3
-    relayLaser = 346
-    relayPump = 6
-    relayValve1 = 5
-    relayValve2 = 4
-    relayValve3 = 3
-    relayTEC1 = 344
-    relayTEC2 = 351
-    relay2 = 499
-    relay3 = 497
-    relayALL = [relayLaser, relayPump, relayValve1, relayValve2, relayValve3, relayTEC1, relayTEC2, relay2, relay3]
-    
-    global laser, moistPower, moist1, moist2, moist3, moist4, temp1, temp2, temp3, temp4, batteryV, shuntV,diodeC
-    laser = 1
-    moistPower = 330                 ## GPIO moisture sensor power
-    moist1 = 329                     ## GPIO moisture sensor 1
-    moist2 = 332                     ## GPIO moisture sensor 2
-    moist3 = 333                     ## GPIO moisture sensor 3
-    moist4 = 336                     ## GPIO moisture sensor 4
-    tempPower = 2
-    #temp1 =  [0, 4]                  ## [adcBank, pin] - temp sensor 1
-    #temp2 =  [0, 5]                  ## [adcBank, pin] - temp sensor 2
-    #temp3 =  [1, 0]                  ## [adcBank, pin] - temp sensor 3
-    #temp4 =  [1, 1]                  ## [adcBank, pin] - temp sensor 4
-    #tempSC = [1, 2]                  ## [adcBank, pin] - temp sensor SC
-    #batteryV = 1                     ## ADC for battery voltage
-    #shuntV = 1                       ## ADC pin for system power shunt
-    #diodeC = 1                       ## Arduino ADC pin for laser diode current
-    
-    
-    ## Define file to read for temp pins as analog inputs
-    #temp1 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp1[0], temp1[1])
-    #temp2 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp2[0], temp2[1])
-    #temp3 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp3[0], temp3[1])
-    #temp4 =  '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(temp4[0], temp4[1])
-    #tempSC = '/sys/bus/iio/devices/iio:device%d/in_voltage%d_raw' %(tempSC[0], tempSC[1])
-    
-    ## GPIO pins for status LED's
-    global LEDbatG, LEDbatY, LEDbatR, LEDbusy, LEDready, LEDpump, LEDv1, LEDv2, LEDv3
-    LEDbatG = 11
-    LEDbatY = 10
-    LEDbatR = 9
-    LEDbusy = 8
-    LEDready = 7
-    LEDpump = 6                      ## Same GPIO pin as relayPump
-    LEDv1 = 5                        ## Same GPIO pin as relayV1
-    LEDv2 = 4                        ## Same GPIO pin as relayV2
-    LEDv3 = 3                        ## Same GPIO pin as relayV3
-    
-    ## GPIO pins for push buttons
+    ## syntax: [pinNumber, type]
+    ## type = 1 (input), type = 0 (output)
+    ## NOTE: If a GPIO pin is added, be sure to add it to the global variable GPIO so it gets exported and defined
+    ## Relays (all other relays are controlled through the Arduino)
+    global relayLaser, relayTEC1, relayTEC2, relay2, relay3
+    relayLaser = [346, 0]
+    relayTEC1 =  [344, 0]
+    relayTEC2 =  [351, 0]
+    relay2 =     [499, 0]
+    relay3 =     [497, 0]
+    global laser, moistPower, moist1, moist2, moist3, moist4, batteryV, shuntV,diodeC
+    #laser = 1
+    moistPower = [330, 0]            ## GPIO moisture sensor power
+    moist1 =     [329, 1]            ## GPIO moisture sensor 1
+    moist2 =     [332, 1]            ## GPIO moisture sensor 2
+    moist3 =     [333, 1]            ## GPIO moisture sensor 3
+    moist4 =     [336, 1]            ## GPIO moisture sensor 4
+    #batteryV = 1                     ## battery voltage    (external ADC pin)
+    #shuntV = 1                       ## system power shunt (external ADC pin)
     global buttonPump, buttonV1_2, buttonV3, buttonQuit, buttonDAQ
-    buttonPump = 326
-    buttonV1_2 = 347
-    buttonV3 = 349
-    buttonQuit = 350
-    buttonDAQ = 366
+    buttonPump = [326, 1]            ## GPIO pump button
+    buttonV1_2 = [347, 1]            ## GPIO Valve 1 and 2 button
+    buttonV3 =   [349, 1]            ## GPIO Valve 3 button
+    buttonQuit = [350, 1]            ## GPIO Quit button
+    buttonDAQ =  [366, 1]            ## GPIO DAQ button
+    ## With all GPIO pins defined, lump them all into one variable
+    global GPIO
+    GPIO = [relayLaser, relayTEC1, relayTEC2, relay2, relay3, moistPower, moist1, moist2, moist3, moist4, buttonPump, buttonV1_2, buttonV3, buttonQuit, buttonDAQ]
+    
+    ## Arduino Pins
+    ## Analog Pins
+    global temp1, temp2, temp3, temp4, tempSC, diodeC
+    tempSC = 0                       ## temp sensor SC     (arduinoHeader.h)
+    temp1 = 1                        ## temp sensor 1      (arduinoHeader.h)
+    temp2 = 2                        ## temp sensor 2      (arduinoHeader.h)
+    temp3 = 3                        ## temp sensor 3      (arduinoHeader.h)
+    temp4 = 4                        ## temp sensor 4      (arduinoHeader.h)
+    diodeC = 5                       ## laser diode sensor (arduinoHeader.h)
+    # Digital Pins
+    global tempPower, relayPump, relayV1, relayV2, relayV3, LEDready, LEDbusy, LEDbatR, LEDbatY, LEDbatG
+    tempPower = 2                    ## Temp sensor power  (arduinoHeader.h)
+    relayPump = 3                    ## Pump   relay/LED   (arduinoHeader.h)
+    relayV1 = 4                      ## Valve1 relay/LED   (arduinoHeader.h)
+    relayV2 = 5                      ## Valve2 relay/LED   (arduinoHeader.h)
+    relayV3 = 6                      ## Valve3 relay/LED   (arduinoHeader.h)
+    LEDready = 7                     ## Ready LED [Green]  (arduinoHeader.h)
+    LEDbusy = 8                      ## Busy  LED [Red]    (arduinoHeader.h)
+    LEDbatR = 9                      ## SoC   LED [Red]    (arduinoHeader.h)
+    LEDbatY = 10                     ## SoC   LED [Yellow] (arduinoHeader.h)
+    LEDbatG = 11                     ## SoC   LED [Green]  (arduinoHeader.h)
     
     ## Status variables
     global statusLaser, statusCam, statusPump, statusV1, statusV1, statusV2, statusV3, statusM1, statusM2, statusM3, statusM4
@@ -103,7 +97,7 @@ def init():
     statusM4 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist4))
     
     ## Misc. Global variables
-    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap, connected
+    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap, connected, relayALL
     pumpTime = 10                      ## Pump time to cycle in new sample
     DAQtime = 15                       ## Standard image acq. time in seconds
     ADC = 24
@@ -119,6 +113,7 @@ def init():
     Rshunt = 0.75                     ## Resistance of shunt resistor
     batCap = 100                      ## total usable battery capacity in Ah
     connected = 0;
+    relayALL = [relayLaser, relayPump, relayV1, relayV2, relayV3, relayTEC1, relayTEC2, relay2, relay3]
     
     ## UDP message legend
     comDAQ = 'DHM_record'                          # Start DAQ
@@ -131,60 +126,6 @@ def init():
     comVref = 'DHM_refValve'                       # Switch the reference channel valve
     comDAQauto = 'DHM_auto'                        # Let DHM run its own cycle
     comOFF = 'SYS_off'                             # Non-emergency shutdown
-    
-def defineGPIO():
-    ## Export all GPIO pins so that they are available for access
-    
-    
-    ## Establish all LED pins as GPIO outputs
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDbatG))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDbatY))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDbatR))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDbusy))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDready))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDpump))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDv1))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDv2))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(LEDv3))
-    
-    ## Establish all push buttons as GPIO inputs
-    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonPump))
-    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonV1_2))
-    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonV3))
-    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonQuit))
-    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(buttonDAQ))
-    
-    ## Establish all moisture sensor pins as GPIO inputs and the power pin as output
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(moistPower))
-    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(moist1))
-    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(moist2))
-    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(moist3))
-    os.system('echo in > /sys/class/gpio/gpio%d/direction' %(moist4))
-    
-    ## Establish remaining GPIO pins as appropriate
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(laser))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayLaser))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayPump))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayValve1))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayValve2))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayValve3))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayTEC1))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relayTEC2))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relay2))
-    os.system('echo out > /sys/class/gpio/gpio%d/direction' %(relay3))
-    return
-
-def syncTime():
-    try:
-        c = ntplib.NTPClient()
-        response = c.request('pool.ntp.org')
-        os.system('date ' + time.strftime('%m%d%H%M%Y.%S',time.localtime(response.tx_time)))
-        message = "Time syncronized with host server"
-        PRINT.event(message)
-    except Exception as e:
-        message = "Could not sync time with host server. Error is as follows:\n", e
-        PRINT.event(message)
-    return
     
 def touch(fname):
     times=None

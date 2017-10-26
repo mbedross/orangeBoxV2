@@ -12,7 +12,6 @@ RUN.module(inputs)
 
 """
 
-import socket
 import os
 import os.path
 import time
@@ -53,38 +52,6 @@ def pump():
         lock = os.path.isfile(header.pumpLock)
         
     os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.relayPump))
-    return
-
-def connectUDP():
-    """
-    
-    This module connects the DHM to the host computer via UDP. This script is only
-    intended to be ran once at start up. Once the connection is established, the
-    DHM sends an intiating message to the host computer
-    
-    """
-    message = "UDP target IP: %s, UDP target port: %d" % (header.UDP_IP, header.UDP_PORT)
-    PRINT.event(message)
-    
-    try:
-        ## Create a UDP socket
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    
-        message = "Socket created: %s:%d" % (header.UDP_IP, header.UDP_PORT)
-        PRINT.event(message)
-        PRINT.udp(message)
-    
-        ## Send MESSAGE to verify connection
-        sock.sendto(MESSAGE, (header.UDP_IP, header.UDP_PORT))
-    
-        message = "Initialization message sent over UDP, now awaiting commands..."
-        PRINT.event(message)
-        PRINT.udp(message)
-        header.connected = 1
-    except Exception as e:
-        message = "UDP connection failed with following error:"
-        PRINT.event(message)
-        PRINT.event(e)
     return
 
 def rampLaserUP():
