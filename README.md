@@ -53,7 +53,6 @@ This script contains all modules that run a function. The modules include:
 
 ```
 RUN.pump()
-RUN.connectUDP()
 RUN.powerOFF()
 RUN.EMERGENCYoff()
 ```
@@ -80,17 +79,6 @@ touch(header.pumpLock)         ## Create lock file
 RUN.pump()
 os.remove(header.pumpLock)     ## Remove lock file
 ```
-
-#### RUN.connectUDP()
-
-This script attempts to connect to an IP address and Port Number defined in the header.py file. The IP and Port numbers are defined as the variable:
-
-```
-header.UDP_IP
-header.UDP_PORT
-```
-
-Once connected, the script will send a message to the host UDP server to confirm connection, this message is also defined in the header.py file as header.MESSAGE
 
 #### RUN.powerOFF()
 
@@ -152,3 +140,16 @@ This module sets the length of time that DAQ will occur. The camera is controlle
 #### SET.powerRelay(relayNumber, state)
 
 This module energizes or de-energizes relay coils. These relays are Single Pole Dual Throw (SPDT). There is one common, one Normally Open (NO), and one Normally Closed (NC) lead. Energizing the coil (state = 1) completes the circuit between the common and NC lead.
+
+### MAIN.py
+
+#### MAIN.connectUDP()
+
+This script attempts to connect to an IP address and Port Number defined in the header.py file. The IP and Port numbers are defined as the variable:
+
+```
+header.UDP_IP
+header.UDP_PORT
+```
+
+Once connected, the script will send a message to the host UDP server to confirm connection, this message is also defined in the header.py file as header.MESSAGE
