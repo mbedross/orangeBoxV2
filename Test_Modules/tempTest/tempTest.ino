@@ -11,9 +11,8 @@ void setup() {
     // Make sure everything is off
     digitalWrite(tempPower, LOW);
   
-    float Temps[5];
-    int Res[5];
-    float steinhart;
+
+    int x;
     
     // Send a '0' over serial so computer knows arduino is ready
     Serial.println('0');
@@ -21,7 +20,8 @@ void setup() {
 
 void loop() {
   
-    x=1;
+    int x=1;
+    char input;
     while (x) {
         if (Serial.available() >0) {
             input = Serial.read();
@@ -35,13 +35,17 @@ void loop() {
             default:
                 break;
         }
-    input = 0;
+    int input = 0;
     }
 }
 
 void TEMP() {
+    float Temps[5];
+    float steinhart;
+    int Res[5];
+    int res;
     digitalWrite(tempPower, HIGH);
-    delay(500)                     // Wait 500 ms for voltage to stabilize
+    delay(500);                     // Wait 500 ms for voltage to stabilize
     Res[0] = analogRead(temp1);
     Res[1] = analogRead(temp2);
     Res[2] = analogRead(temp3);
@@ -50,7 +54,7 @@ void TEMP() {
     digitalWrite(tempPower, LOW);
     
     // Calculate temperatures
-    for (int i=0; i <= 4; i++){
+    for (int i=0; i <= 4; i++) {
         // Convert analog reading to resistance value
         res = (1023 / Res[i]) - 1;
         res = seriesRes / res;
@@ -63,5 +67,7 @@ void TEMP() {
         steinhart -= 273.15; 
         Temps[i] = steinhart;
     }
-    Serial.print(Temps); 
+    for (int i = 0; i <= 4; i++) {
+        Serial.println(Temps[i]);
+    }
 }
