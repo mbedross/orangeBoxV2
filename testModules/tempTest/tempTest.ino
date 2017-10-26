@@ -58,11 +58,11 @@ void TEMP() {
         res = (1023 / Res[i]) - 1;
         res = seriesRes * res;
         // Calculate temperature from res value
-        steinhart = res / thermNom;     // (R/Ro)
-        steinhart = log(steinhart);                  // ln(R/Ro)
-        steinhart /= BCOEFFICIENT;                   // 1/B * ln(R/Ro)
-        steinhart += 1.0 / (ambientTemp + 273.15); // + (1/To)
-        steinhart = 1.0 / steinhart;                 // Invert
+        steinhart = res / thermNom;                    // (R/Ro)
+        steinhart = log(steinhart);                    // ln(R/Ro)
+        steinhart /= BCOEFFICIENT;                     // 1/B * ln(R/Ro)
+        steinhart += 1.0 / (ambientTemp + 273.15);     // + (1/To)
+        steinhart = 1.0 / steinhart;                   // Invert
         steinhart -= 273.15;
         Temps[i] = steinhart;
     }
