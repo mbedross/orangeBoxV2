@@ -22,5 +22,5 @@ int LED8 = 10;
 int LED9 = 11;
 #define seriesRes 10000
 #define thermNom 10000
-#define BCOEFFICIENT 3950
+#define BCOEFFICIENT 3740
 #define ambientTemp 25

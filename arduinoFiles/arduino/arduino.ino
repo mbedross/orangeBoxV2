@@ -1,9 +1,11 @@
 #include"arduinoHeader.h"
 
+int input;
+
 void setup() {
 
     // Begin serial comm. and establish digital outputs
-    Serial.begin(9600);
+    Serial.begin(19200);
   
     // Define all appropriate digital pins as input/output
     pinMode(tempPower, OUTPUT);
@@ -29,65 +31,68 @@ void setup() {
     digitalWrite(LED8, LOW);
     digitalWrite(LED9, LOW);
     
-    int x=1;
-    int input = 0;
+    int x;
     
     // Send a '0' over serial so computer knows arduino is ready
     Serial.println('0');
+    
 }
 
 void loop() {
-  
+    int x = 1;
     while (x) {
+        String inString;
+        int input;
         if (Serial.available() >0) {
-            input = Serial.read();
-            Serial.flush();
+            inString = Serial.readString();
+            input = inString.toInt();
+            //Serial.flush();
         }
         switch (input) {
-            case '1':
+            case 1:
                 // Call to read temp sensors
                 TEMP();
                 break;
-            case '2':
+            case 2:
                 // Call to turn pump on
                 PUMP();
                 break;
-            case '3':
+            case 3:
                 // Call to turn valve 1 on/off
                 digitalWrite(relayV1, !digitalRead(relayV1));
                 break;
-            case '4':
+            case 4:
                 // Call to turn valve 2 on/off
                 digitalWrite(relayV2, !digitalRead(relayV2));
                 break;
-            case '5':
+            case 5:
                 // Call to turn valve 3 on/off
                 digitalWrite(relayV3, !digitalRead(relayV3));
                 break;
-            case '6':
+            case 6:
                 // Call to turn LED5 on/off
                 digitalWrite(LED5, !digitalRead(LED5));
                 break;
-            case '7':
+            case 7:
                 // Call to turn LED6 on/off
                 digitalWrite(LED6, !digitalRead(LED6));
                 break;
-            case '8':
+            case 8:
                 // Call to turn LED7 on/off
                 digitalWrite(LED7, !digitalRead(LED7));
                 break;
-            case '9':
+            case 9:
                 // Call to turn LED8 on/off
                 digitalWrite(LED8, !digitalRead(LED8));
                 break;
-            case '10':
+            case 10:
                 // Call to turn LED9 on/off
                 digitalWrite(LED9, !digitalRead(LED9));
                 break;
             default:
                 break;
         }
-    int input = 0;
+    input = 0;
     }
 }
 
@@ -128,18 +133,27 @@ void TEMP() {
 void PUMP() {
     // Begin running pump while checking the serial port. If command to stop pump
     // is received, end while loop
-    lock = 1;
+    // Make sure Valves 1 and 2 are open
+    digitalWrite(relayV1, LOW);
+    digitalWrite(relayV2, LOW);
+    delay(500);
+    Serial.println("Pump is on");
+    int lock = 1;
+    int input;
+    String inString;
     while (lock) {
         if (Serial.available() >0) {
-            input = Serial.read();
-            Serial.read();
-            if (input = 'off') {
-                lock = 0;
+            inString = Serial.readString();
+            input = inString.toInt();
+            //Serial.flush();
+            if (input == 2) {
+                break;
             }
         }
+        delay(100);
         digitalWrite(relayPump, HIGH);
         delay(100);
         digitalWrite(relayPump,LOW);
-        delay(100)
     }
+    Serial.println("Pump is off");
 }
