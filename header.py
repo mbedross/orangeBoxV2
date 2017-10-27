@@ -11,7 +11,6 @@ Manu's MacBook Pro's IP in the wind tunnel is 192.168.1.14 (port is arbitrary)
 
 """
 
-import ntplib
 import os
 
 def init():
@@ -37,7 +36,7 @@ def init():
     relay2 =     [499, 0]
     relay3 =     [497, 0]
     global laser, moistPower, moist1, moist2, moist3, moist4, batteryV, shuntV,diodeC
-    #laser = 1
+    #laser = 1                        ## GPIO laser optical power
     moistPower = [330, 0]            ## GPIO moisture sensor power
     moist1 =     [329, 1]            ## GPIO moisture sensor 1
     moist2 =     [332, 1]            ## GPIO moisture sensor 2
