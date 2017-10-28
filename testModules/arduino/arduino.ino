@@ -37,54 +37,70 @@ void setup() {
 }
 
 void loop() {
+    String content = "";
+    char character;
     int x = 1;
+    int input;
     while (x) {
-        String input;
-        if (Serial.available() >0) {
-            input = Serial.readString();
+        //String input;
+        //if (Serial.available() >0) {
+            //input = Serial.readString();
+            //Serial.println(input);
             //Serial.flush();
+        //}
+        while(Serial.available()) {
+            character = Serial.read();
+            content.concat(character);
         }
-        if (input == "1") {
+        input = content.toInt();
+        content = "";
+        if (input == 1) {
             // Call to read temp sensors
             TEMP();
         }
-        if (input == "2") {
+        if (input == 2) {
             // Call to turn pump on
             PUMP();
         }
-        if (input == "3") {
+        if (input == 3) {
             // Call to turn valve 1 on/off
             digitalWrite(relayV1, !digitalRead(relayV1));
         }
-        if (input == "4") {
+        if (input == 4) {
             // Call to turn valve 2 on/off
             digitalWrite(relayV2, !digitalRead(relayV2));
         }
-        if (input == "5") {
+        if (input == 5) {
             // Call to turn valve 3 on/off
             digitalWrite(relayV3, !digitalRead(relayV3));
         }
-        if (input == "6") {
+        if (input == 6) {
             // Call to turn LED5 on/off
             digitalWrite(LED5, !digitalRead(LED5));
         }
-        if (input == "7") {
+        if (input == 7) {
             // Call to turn LED6 on/off
             digitalWrite(LED6, !digitalRead(LED6));
         }
-        if (input == "8") {
+        if (input == 8) {
             // Call to turn LED7 on/off
             digitalWrite(LED7, !digitalRead(LED7));
         }
-        if (input == "9") {
+        if (input == 9) {
             // Call to turn LED8 on/off
             digitalWrite(LED8, !digitalRead(LED8));
         }
-        if (input == "10") {
+        if (input == 10) {
             // Call to turn LED9 on/off
             digitalWrite(LED9, !digitalRead(LED9));
         }
-    input = "0";
+        if (input == 11) {
+            // Call to turn all digital pins off
+            for (byte i = 0; i < pinCount; i++) {   
+                digitalWrite(pin[i], LOW);
+            }
+        }
+    input = 0;
     }
 }
 
@@ -125,20 +141,29 @@ void TEMP() {
 void PUMP() {
     // Begin running pump while checking the serial port. If command to stop pump
     // is received, end while loop
+    // Remember valve 1 and 2 states before pumping
+    int v1;
+    int v2;
+    v1 = digitalRead(relayV1);
+    v2 = digitalRead(relayV2);
     // Make sure Valves 1 and 2 are open
     digitalWrite(relayV1, LOW);
     digitalWrite(relayV2, LOW);
     delay(500);
     Serial.println("Pump is on");
+    String content = "";
+    char character;
     int lock = 1;
-    String input;
+    int input;
     while (lock) {
-        if (Serial.available() >0) {
-            input = Serial.readString();
-            //Serial.flush();
-            if (input == "2") {
-                break;
-            }
+        while(Serial.available()) {
+            character = Serial.read();
+            content.concat(character);
+        }
+        input = content.toInt();
+        content = "";
+        if (input == 2) {
+            break;
         }
         delay(100);
         digitalWrite(relayPump, HIGH);
@@ -146,4 +171,8 @@ void PUMP() {
         digitalWrite(relayPump,LOW);
     }
     Serial.println("Pump is off");
+    delay(500);
+    // Revert valves back to original state before pumping
+    digitalWrite(relayV1, v1);
+    digitalWrite(relayV2, v2);
 }

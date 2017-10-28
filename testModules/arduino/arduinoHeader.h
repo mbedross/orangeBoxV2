@@ -4,6 +4,8 @@
 // doesn't directly communicate to the Arduino pins on the UDOO, but relies on a
 // separate Intel Curie processor to run the Arduino pins
 
+// If adding digital pins, makes sure to add the pin number to the array at the bottom of this header file (pin) so it can be included in any calls to operate on ALL the pins
+
 int temp5 = 0;
 int temp4 = 1;
 int temp3 = 2;
@@ -24,3 +26,8 @@ int LED9 = 11;
 #define thermNom 10000
 #define BCOEFFICIENT 3740
 #define ambientTemp 25
+
+// declare an array of all Digital pin values
+byte pin[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+// then calculate it's size. Now if you add a pin it will automatically include it
+byte pinCount = sizeof(pin) / sizeof(pin[0]);
