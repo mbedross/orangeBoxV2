@@ -64,17 +64,18 @@ def init():
     temp4 = 4                        ## temp sensor 4      (arduinoHeader.h)
     diodeC = 5                       ## laser diode sensor (arduinoHeader.h)
     # Digital Pins
+    ## Syntax: pin = [pinNumber, state]
     global tempPower, relayPump, relayV1, relayV2, relayV3, LEDready, LEDbusy, LEDbatR, LEDbatY, LEDbatG
-    tempPower = 2                    ## Temp sensor power  (arduinoHeader.h)
-    relayPump = 3                    ## Pump   relay/LED   (arduinoHeader.h)
-    relayV1 = 4                      ## Valve1 relay/LED   (arduinoHeader.h)
-    relayV2 = 5                      ## Valve2 relay/LED   (arduinoHeader.h)
-    relayV3 = 6                      ## Valve3 relay/LED   (arduinoHeader.h)
-    LEDready = 7                     ## Ready LED [Green]  (arduinoHeader.h)
-    LEDbusy = 8                      ## Busy  LED [Red]    (arduinoHeader.h)
-    LEDbatR = 9                      ## SoC   LED [Red]    (arduinoHeader.h)
-    LEDbatY = 10                     ## SoC   LED [Yellow] (arduinoHeader.h)
-    LEDbatG = 11                     ## SoC   LED [Green]  (arduinoHeader.h)
+    tempPower = [2, 0]               ## Temp sensor power  (arduinoHeader.h)
+    relayPump = [3, 0]               ## Pump   relay/LED   (arduinoHeader.h)
+    relayV1 =   [4, 0]               ## Valve1 relay/LED   (arduinoHeader.h)
+    relayV2 =   [5, 0]               ## Valve2 relay/LED   (arduinoHeader.h)
+    relayV3 =   [6, 0]               ## Valve3 relay/LED   (arduinoHeader.h)
+    LEDready =  [7, 0]               ## Ready LED [Green]  (arduinoHeader.h)
+    LEDbusy =   [8, 0]               ## Busy  LED [Red]    (arduinoHeader.h)
+    LEDbatR =   [9, 0]               ## SoC   LED [Red]    (arduinoHeader.h)
+    LEDbatY =   [10, 0]              ## SoC   LED [Yellow] (arduinoHeader.h)
+    LEDbatG =   [11, 0]              ## SoC   LED [Green]  (arduinoHeader.h)
     
     ## Status variables
     global statusLaser, statusCam, statusPump, statusV1, statusV1, statusV2, statusV3, statusM1, statusM2, statusM3, statusM4
@@ -96,7 +97,7 @@ def init():
     statusM4 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist4))
     
     ## Misc. Global variables
-    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap, connected, relayALL
+    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap, connected, relayUDOO, relayArduino, arduinoPort
     pumpTime = 10                      ## Pump time to cycle in new sample
     DAQtime = 15                       ## Standard image acq. time in seconds
     ADC = 24
@@ -112,9 +113,12 @@ def init():
     Rshunt = 0.75                     ## Resistance of shunt resistor
     batCap = 100                      ## total usable battery capacity in Ah
     connected = 0;
-    relayALL = [relayLaser, relayPump, relayV1, relayV2, relayV3, relayTEC1, relayTEC2, relay2, relay3]
+    arduinoPort = "/dev/ttyACM0"
+    relayUDOO = [relayLaser, relayTEC1, relayTEC2, relay2, relay3]
+    relayArduino = [relayPump, relayV1, relayV2, relayV3]
     
-    ## UDP message legend
+    ## UDP command legend
+    global comDAQ, comDAQstop, comStatus, comPumpOn, comPumpOff, comVinlet, comVoutlet, comVref, comDAQauto, comOFF
     comDAQ = 'DHM_record'                          # Start DAQ
     comDAQstop = 'DHM_stop'                        # Stop DAQ
     comStatus = 'DHM_status'                       # Query for DHM status
@@ -125,6 +129,21 @@ def init():
     comVref = 'DHM_refValve'                       # Switch the reference channel valve
     comDAQauto = 'DHM_auto'                        # Let DHM run its own cycle
     comOFF = 'SYS_off'                             # Non-emergency shutdown
+    
+    ## Arduino command legend
+    global ardTemp, ardPump, ardValve1, ardValve2, ardValve3, ardLEDready, ardLEDbusy, ardLEDbatR, ardLEDbatY, ardLEDbatG, ardALLoff
+    ardTemp = "1"
+    ardPump = "2"
+    ardValve1 = "3"
+    ardValve2 = "4"
+    ardValve3 = "5"
+    ardLEDready = "6"
+    ardLEDbusy = "7"
+    ardLEDbatR = "8"
+    ardLEDbatY = "9"
+    ardLEDbatG = "10"
+    ardALLoff = "11"
+    return
     
 def touch(fname):
     times=None

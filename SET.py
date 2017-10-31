@@ -17,8 +17,11 @@ import os
 import header
 header.init()
 
-def LED(pinNumber, state):
-    os.system('echo %d > /sys/class/gpio/gpio%d/value' %(state, pinNumber))
+def LED(pinNumber):
+    ## All LED's are now controlled by the Arduino 101
+    Pin = str.encode(pinNumber)
+    ser.write(Pin)
+    ##os.system('echo %d > /sys/class/gpio/gpio%d/value' %(state, pinNumber))
     return
 
 def DAQtime(daqTime):

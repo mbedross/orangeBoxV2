@@ -54,8 +54,18 @@ def connectUDP():
 __init__.exportGPIO(header.GPIO)
 __init__.defineGPIO(header.GPIO)
 
+## Establish Serial Connection with Arduino 101
+__init__.connectArduino(header.arduinoPort)
+
+if header.connected == 1:
+    ## If UDP connection is established, sync CPU time with host server
+    __init__.syncTime()
+
+
 ## Turn on the 'busy' LED to let user(s) know start has begun
-SET.LED(header.LEDbusy, 1)
+SET.LED(header.LEDbusy[0])
+## Update LEDbusy state to 1
+header.LEDbusy[1] = 1
 
 ## Begin monitoring moisture sensors
 ## This is called by a subprocess in order to run in the background

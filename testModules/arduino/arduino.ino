@@ -4,7 +4,7 @@ void setup() {
 
     // Begin serial comm. and establish digital outputs
     Serial.begin(19200);
-  
+
     // Define all appropriate digital pins as input/output
     pinMode(tempPower, OUTPUT);
     pinMode(relayPump, OUTPUT);
@@ -15,8 +15,8 @@ void setup() {
     pinMode(LED6, OUTPUT);
     pinMode(LED7, OUTPUT);
     pinMode(LED8, OUTPUT);
-    pinMode(LED9, OUTPUT); 
-   
+    pinMode(LED9, OUTPUT);
+
     // Make sure everything is off
     digitalWrite(tempPower, LOW);
     digitalWrite(relayPump, LOW);
@@ -28,12 +28,12 @@ void setup() {
     digitalWrite(LED7, LOW);
     digitalWrite(LED8, LOW);
     digitalWrite(LED9, LOW);
-    
+
     int x;
     
     // Send a '0' over serial so computer knows arduino is ready
     Serial.println('0');
-    
+
 }
 
 void loop() {
@@ -42,12 +42,7 @@ void loop() {
     int x = 1;
     int input;
     while (x) {
-        //String input;
-        //if (Serial.available() >0) {
-            //input = Serial.readString();
-            //Serial.println(input);
-            //Serial.flush();
-        //}
+
         while(Serial.available()) {
             character = Serial.read();
             content.concat(character);
@@ -96,11 +91,11 @@ void loop() {
         }
         if (input == 11) {
             // Call to turn all digital pins off
-            for (byte i = 0; i < pinCount; i++) {   
+            for (byte i = 0; i < pinCount; i++) {
                 digitalWrite(pin[i], LOW);
             }
-        }
-    input = 0;
+        }  
+        input = 0;
     }
 }
 
@@ -117,7 +112,7 @@ void TEMP() {
     Res[3] = analogRead(temp4);
     Res[4] = analogRead(temp5);
     digitalWrite(tempPower, LOW);
-    
+
     // Calculate temperatures
     for (int i=0; i <= 4; i++) {
         // Convert analog reading to resistance value
@@ -132,7 +127,7 @@ void TEMP() {
         steinhart -= 273.15;
         Temps[i] = steinhart;
     }
-    
+
     for (int i = 0; i <= 4; i++) {
         Serial.println(Temps[i]);
     }
