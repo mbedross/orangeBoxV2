@@ -63,7 +63,7 @@ void loop() {
                 PUMP();
             }
             if (action == 2) {
-            Serial.println(digitalRead(relayPump));
+                Serial.println(digitalRead(relayPump));
             }
         }
 
@@ -80,7 +80,7 @@ void loop() {
                 Serial.println(input);
             }
             if (action == 2) {
-            Serial.println(digitalRead(relayV1));
+                Serial.println(digitalRead(relayV1));
             }
         }
 
@@ -97,7 +97,7 @@ void loop() {
                 Serial.println(input);
             }
             if (action == 2) {
-            Serial.println(digitalRead(relayV2));
+                Serial.println(digitalRead(relayV2));
             }
         }
 
@@ -114,7 +114,7 @@ void loop() {
                 Serial.println(input);
             }
             if (action == 2) {
-            Serial.println(digitalRead(relayV3));
+                Serial.println(digitalRead(relayV3));
             }
         }
 
