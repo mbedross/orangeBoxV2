@@ -10,19 +10,15 @@ import serial
 import time
 import datetime
 
-ser = serial.Serial("/dev/ttyACM1", baudrate = 9600)
-
-## open serial ports if closed
-if(ser.isOpen() == False):
-    ser.open()
-
-def arduino_connect(file):
+def arduino_connect():
     
+    ser = serial.Serial("/dev/ttyACM1", baudrate = 9600)
+
+    ## open serial ports if closed
+    if(ser.isOpen() == False):
+        ser.open()
     connected = False;        ##(this is a logical statement to make connection
     while not connected:
         serin     = ser.read()
         connected = True
-        ts        = time.time()
-    	st        = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-        print >>file, st, " - Arduino Connected"
     return
