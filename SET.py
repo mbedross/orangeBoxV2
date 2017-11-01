@@ -13,6 +13,7 @@ SET.module(inputs)
 """
 
 import PRINT
+import GET
 import os
 import header
 header.init()
@@ -21,7 +22,14 @@ def LED(pinNumber):
     ## All LED's are now controlled by the Arduino 101
     Pin = str.encode(pinNumber)
     ser.write(Pin)
-    ##os.system('echo %d > /sys/class/gpio/gpio%d/value' %(state, pinNumber))
+    Message = GET.Serial()
+    if Message != pinNumber:
+        message = "Something went wrong while turnin LED %d on/off. Message from arduino is as follows:" %(pinNumber)
+        PRINT.event(message)
+        PRINT.event(Message)
+    else:
+        message = "LED %d successfully switched on/off" %(pinNumber)
+        PRINT.event(message)
     return
 
 def DAQtime(daqTime):
@@ -35,37 +43,33 @@ def DAQtime(daqTime):
         PRINT.event(e)
     return
 
-def powerRelay(relayNumber, state):
+def relay(relayNumber, state):
     try:
-        if relayNumber == "all":
-            for x in range(0, len(header.relayALL)-1):
-                os.system('echo "%d" |sudo tee /sys/class/gpio/gpio%s/value' %(state, header.relayALL[x]))
-            if state == 0:
-                message = "All relays have been turned off"
-            else:
-                message = "All relays have been turned on"
-            PRINT.event(message)
         for x in range(0, len(relayNumber)-1):
-            os.system('echo "%d" |sudo tee /sys/class/gpio/gpio%s/value' %(state, relayNumber[x]))
-            if relayNumber[x] == header.relayLaser:
-                header.statusLaser = state
-                if state == 0:
-                    message = "The laser has been shut off"
-                    PRINT.event(message)
-                else:
-                    message = "The laser has been turned on"
-                    PRINT.event(message)
-            if relayNumber[x] == header.relayPump:
-                header.statusPump = state
-                if state == 0:
-                    message = "The pump has been shut off"
-                    PRINT.event(message)
-                else:
-                    message = "The pump has been turned on"
-                    PRINT.event(message)
+            os.system('echo "%d" |sudo tee /sys/class/gpio/gpio%s/value' %(state[x], relayNumber[x]))
+            message = "GPIO Pin #%d (relay) has been set to %d" %(relayNumber[x], state[x])
     except Exception as e:
         message = "Power Relay %d was unable to be set. Error is as follows:" %(relayNumber[x])
         PRINT.event(message)
         PRINT.event(e)
     return
 
+def arduinoRelay(relayNumber, state):
+    try:
+        for x in range(0, len(relayNumber)-1):
+            Pin = str.encode(relayNumber[x])
+            ser.write(Pin)
+            Message = GET.Serial
+            if Message != relayNumber[x]:
+                message = "Something went wrong. Arduino error is as follows:"
+                PRINT.event(message)
+                PRINT.event(Message)
+            else:
+                message = "Arduino relay %d was set to %d" %(relayNumber, state)
+                PRINT.event(mesage)
+            time.sleep(0.5)    ## Allow time for action to execute before going to bext iteration
+    except Exception as e:
+        message = "Power Relay %d was unable to be set. Error is as follows:" %(relayNumber[x])
+        PRINT.event(message)
+        PRINT.event(e)
+    return

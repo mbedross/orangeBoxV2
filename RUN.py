@@ -32,26 +32,19 @@ def pump():
                  
     """
     
-    ## First make sure all valves are open before pump turns on
-    if header.relayValve1 == 1:
-        vNumber = header.relayValve1
-        state = 0
-        SET.valve(vNumber, state)
-    if header.relayValve2 == 1:
-        vNumber = header.relayValve2
-        state = 0
-        SET.valve(vNumber, state)
-    
+    SET.arduinoRelay(header.relayPump[0])
+    header.relayPump[1] = 1
+    (message) = GET.serial()
+    PRINT.event(message)
     lock = True
 
     while lock != False:
-        os.system('echo "1" |sudo tee /sys/class/gpio/gpio%s/value' %(header.relayPump))
-        time.sleep(0.2)
-        os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.relayPump))
-        time.sleep(0.2)
         lock = os.path.isfile(header.pumpLock)
         
-    os.system('echo "0" |sudo tee /sys/class/gpio/gpio%s/value' %(header.relayPump))
+    SET.arduinoRelay(header.relayPump[0])
+    header.relayPump[1] = 0
+    (message) = GET.serial()
+    PRINT.event(message)
     return
 
 def rampLaserUP():

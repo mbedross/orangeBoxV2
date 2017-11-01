@@ -14,17 +14,18 @@ import GET
 
 """
 
+import time
 import header
 header.init()
-import math
 
-def relay(relayNumber):
-    if relayNumber == "all":
-        for x in range(0, len(header.relayALL)-1):
-            relayState[x] = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(relayNumber))
-    else:
-        relayState = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(relayNumber))
-    return (relayState)
+def serialRead():
+    while 1:
+        tdata = ser.read()           # Wait forever for anything
+        time.sleep(1)              # Sleep (or inWaiting() doesn't give the correct value)
+        data_left = s.inWaiting()  # Get the number of characters ready to be read
+        tdata += ser.read(data_left) # Do the read and combine it with the first character
+        break
+    return tdata
 
 def pump():
     lock = os.path.isfile(header.pumpLock)
@@ -35,21 +36,29 @@ def pump():
     return pump
 
 def temp():
+    Pin = str.encode(header.tempPower[0])
+    ser.write(Pin)
+    Temps = serialRead()
+    """
+    TO BE WRITTEN/REVISED
     
-    ## Read temp sensors
-    header.Temp[0] = int(open(header.temp1).read())
-    header.Temp[1] = int(open(header.temp2).read())
-    header.Temp[2] = int(open(header.temp3).read())
-    header.Temp[3] = int(open(header.temp4).read())
-    header.Temp[4] = int(open(header.tempSC).read())
-    
-    ## Now calculate temperatures
-    bit = 12                # ADC bits
-    bitDepth = math.pow(2,bit)
-    
-    for x in range(0, len(Temp)-1):
-        Rt = ((bitDepth/header.Temp[x])-1)*header.R;
-        logR = math.log(Rt);
-        header.Temp[x] = 1 / (header.tempA + (header.tempB * logR) + (header.tempC * logR * logR * logR));
-    
-    return header.Temp
+    The arduino takes care of all the temp reading stuff (like the Steinhart-Hart 
+    equation and sends out the temperatures one by one (EOL in between) through
+    the serial port. The question is: does GET.Serial() catch all five temperatures
+    our does it have to be modified to catch all five. AND after it catches all five
+    what would the string look like? How can temperature (numbers) be extracted from the string?
+    """
+    return Temps
+
+def relay(relayNumber):
+    for x in range(0, len(relayNumber)-1):
+        relayState[x] = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(relayNumber[x]))
+    return (relayState)
+
+def arduinoRelay(relayNumber):
+    for x in range(0, len(relayNumber)-1):
+        Pin = relayNumber[x] + 0.2      ## the 0.2 tells the arduino to query pin state
+        Pin = str.encode(Pin)
+        ser.write(Pin)
+        relayState[x] = serialRead()
+    return (relayState)
