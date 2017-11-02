@@ -29,8 +29,6 @@ void setup() {
     digitalWrite(LED8, LOW);
     digitalWrite(LED9, LOW);
 
-    int x;
-
     // Send a '0' over serial so computer knows arduino is ready
     Serial.println('0');
 
@@ -39,9 +37,10 @@ void setup() {
 void loop() {
     String content = "";
     char character;
-    int x = 1;
-    int input;
-    int action;
+    int x     = 1;
+    int input = 0;
+    int Pin   = 0;
+    int rem   = 0;
     while (x) {
 
         while(Serial.available()) {
@@ -50,166 +49,50 @@ void loop() {
         }
         input = content.toInt();
         content = "";
-
-        if (input == 20) {
-            // Call to read temp sensors
-            TEMP();
-        }
-
-        if (input >= 30 && input < 40) {
-            action = input - 30;
-            if (action == 1) {
-                // Call to turn pump on
-                PUMP();
-            }
-            if (action == 2) {
-                Serial.println(digitalRead(relayPump));
-            }
-        }
-
-        if (input >= 40 && input < 50) {
-            action = input - 40;
-            if (action == 0) {
-                // Call to turn valve 1 off (OPEN)
-                digitalWrite(relayV1, LOW));
-                Serial.println(input);
-            }
-            if (action == 1) {
-                // Call to turn valve 1 on (CLOSE)
-                digitalWrite(relayV1, HIGH));
-                Serial.println(input);
-            }
-            if (action == 2) {
-                Serial.println(digitalRead(relayV1));
-            }
-        }
-
-        if (input >= 50 && input < 60) {
-            action = input - 50;
-            if (action == 0) {
-                // Call to turn valve 2 off (OPEN)
-                digitalWrite(relayV2, LOW));
-                Serial.println(input);
-            }
-            if (action == 1) {
-                // Call to turn valve 2 on (CLOSE)
-                digitalWrite(relayV2, HIGH));
-                Serial.println(input);
-            }
-            if (action == 2) {
-                Serial.println(digitalRead(relayV2));
-            }
-        }
-
-        if (input >= 60 && input < 70) {
-            action = input - 60;
-            if (action == 0) {
-                // Call to turn valve 3 off (OPEN)
-                digitalWrite(relayV3, LOW));
-                Serial.println(input);
-            }
-            if (action == 1) {
-                // Call to turn valve 3 on (CLOSE)
-                digitalWrite(relayV3, HIGH));
-                Serial.println(input);
-            }
-            if (action == 2) {
-                Serial.println(digitalRead(relayV3));
-            }
-        }
-
-        if (input >= 70 && input < 80) {
-            action = input - 70;
-            if (action == 0) {
-                // Call to turn LED5 off
-                digitalWrite(LED5, LOW);
-                Serial.println(input);
-            }
-            if (action == 1) {
-                // Call to turn LED5 on
-                digitalWrite(LED5, HIGH);
-                Serial.println(input);
-            }
-            if (action == 2) {
-                Serial.println(digitalRead(LED5));
-            }
-        }
-
-        if (input >= 80 && input < 90) {
-            action = input - 80;
-            if (action == 0) {
-                // Call to turn LED6 off
-                digitalWrite(LED6, LOW);
-                Serial.println(input);
-            }
-            if (action == 1) {
-                // Call to turn LED6 on
-                digitalWrite(LED6, HIGH);
-                Serial.println(input);
-            }
-            if (action == 2) {
-                Serial.println(digitalRead(LED6));
-            }
-        }
-
-        if (input >= 90 && input < 100) {
-            action = input - 90;
-            if (action == 0) {
-                // Call to turn LED7 off
-                digitalWrite(LED7, LOW);
-                Serial.println(input);
-            }
-            if (action == 1) {
-                // Call to turn LED7 on
-                digitalWrite(LED7, HIGH);
-                Serial.println(input);
-            }
-            if (action == 2) {
-                Serial.println(digitalRead(LED7));
-            }
-        }
-
-        if (input >= 100 && input < 110) {
-            action = input - 100;
-            if (action == 0) {
-                // Call to turn LED8 off
-                digitalWrite(LED8, LOW);
-                Serial.println(input);
-            }
-            if (action == 1) {
-                // Call to turn LED8 on
-                digitalWrite(LED8, HIGH);
-                Serial.println(input);
-            }
-            if (action == 2) {
-                Serial.println(digitalRead(LED8));
-            }
-        }
-
-        if (input >= 110 && input < 120) {
-            action = input - 110;
-            if (action == 0) {
-                // Call to turn LED9 off
-                digitalWrite(LED9, LOW);
-                Serial.println(input);
-            }
-            if (action == 1) {
-                // Call to turn LED9 on
-                digitalWrite(LED9, HIGH);
-                Serial.println(input);
-            }
-            if (action == 2) {
-                Serial.println(digitalRead(LED9));
-            }
-        }
-
+        Pin = input / 10;
+        rem = input - (Pin*10);
         if (input == 1) {
             // Call to turn all digital pins off
             for (byte i = 0; i < pinCount; i++) {
                 digitalWrite(pin[i], LOW);
             }
         }
+        if (input == 2) {
+            // Call to turn all digital pins off
+            for (byte i = 0; i < pinCount; i++) {
+                digitalWrite(pin[i], HIGH);
+            }
+        }
+        if (Pin != 0) {
+            if (Pin == 1 || Pin == 2) {
+                if (Pin == 1) {
+                    // Read temperature sensors
+                    TEMP();
+                }
+                if (Pin == 2) {
+                    // Turn on pump
+                    PUMP();
+                }
+            } else {
+                if (rem == 0) {
+                    // Call to turn valve 1 off (OPEN)
+                    digitalWrite(Pin, LOW);
+                    Serial.println(input);
+                }
+                if (rem == 1) {
+                    // Call to turn valve 2 on (CLOSE)
+                    digitalWrite(Pin, HIGH);
+                    Serial.println(input);
+                }
+                if (rem == 2) {
+                    // Query the digital pin state
+                    Serial.println(digitalRead(relayV2));
+                }
+            }
+        }
         input = 0;
+        Pin = 0;
+        rem = 0;
     }
 }
 
@@ -271,7 +154,7 @@ void PUMP() {
         }
         input = content.toInt();
         content = "";
-        if (input == 2) {
+        if (input == 20) {
             break;
         }
         delay(100);

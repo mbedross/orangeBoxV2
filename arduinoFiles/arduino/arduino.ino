@@ -1,12 +1,10 @@
 #include"arduinoHeader.h"
 
-int input;
-
 void setup() {
 
     // Begin serial comm. and establish digital outputs
     Serial.begin(19200);
-  
+
     // Define all appropriate digital pins as input/output
     pinMode(tempPower, OUTPUT);
     pinMode(relayPump, OUTPUT);
@@ -17,8 +15,8 @@ void setup() {
     pinMode(LED6, OUTPUT);
     pinMode(LED7, OUTPUT);
     pinMode(LED8, OUTPUT);
-    pinMode(LED9, OUTPUT); 
-   
+    pinMode(LED9, OUTPUT);
+
     // Make sure everything is off
     digitalWrite(tempPower, LOW);
     digitalWrite(relayPump, LOW);
@@ -30,69 +28,71 @@ void setup() {
     digitalWrite(LED7, LOW);
     digitalWrite(LED8, LOW);
     digitalWrite(LED9, LOW);
-    
-    int x;
-    
+
     // Send a '0' over serial so computer knows arduino is ready
     Serial.println('0');
-    
+
 }
 
 void loop() {
-    int x = 1;
+    String content = "";
+    char character;
+    int x     = 1;
+    int input = 0;
+    int Pin   = 0;
+    int rem   = 0;
     while (x) {
-        String inString;
-        int input;
-        if (Serial.available() >0) {
-            inString = Serial.readString();
-            input = inString.toInt();
-            //Serial.flush();
+
+        while(Serial.available()) {
+            character = Serial.read();
+            content.concat(character);
         }
-        switch (input) {
-            case 1:
-                // Call to read temp sensors
-                TEMP();
-                break;
-            case 2:
-                // Call to turn pump on
-                PUMP();
-                break;
-            case 3:
-                // Call to turn valve 1 on/off
-                digitalWrite(relayV1, !digitalRead(relayV1));
-                break;
-            case 4:
-                // Call to turn valve 2 on/off
-                digitalWrite(relayV2, !digitalRead(relayV2));
-                break;
-            case 5:
-                // Call to turn valve 3 on/off
-                digitalWrite(relayV3, !digitalRead(relayV3));
-                break;
-            case 6:
-                // Call to turn LED5 on/off
-                digitalWrite(LED5, !digitalRead(LED5));
-                break;
-            case 7:
-                // Call to turn LED6 on/off
-                digitalWrite(LED6, !digitalRead(LED6));
-                break;
-            case 8:
-                // Call to turn LED7 on/off
-                digitalWrite(LED7, !digitalRead(LED7));
-                break;
-            case 9:
-                // Call to turn LED8 on/off
-                digitalWrite(LED8, !digitalRead(LED8));
-                break;
-            case 10:
-                // Call to turn LED9 on/off
-                digitalWrite(LED9, !digitalRead(LED9));
-                break;
-            default:
-                break;
+        input = content.toInt();
+        content = "";
+        Pin = input / 10;
+        rem = input - (Pin*10);
+        if (input == 1) {
+            // Call to turn all digital pins off
+            for (byte i = 0; i < pinCount; i++) {
+                digitalWrite(pin[i], LOW);
+            }
         }
-    input = 0;
+        if (input == 2) {
+            // Call to turn all digital pins off
+            for (byte i = 0; i < pinCount; i++) {
+                digitalWrite(pin[i], HIGH);
+            }
+        }
+        if (Pin != 0) {
+            if (Pin == 1 || Pin == 2) {
+                if (Pin == 1) {
+                    // Read temperature sensors
+                    TEMP();
+                }
+                if (Pin == 2) {
+                    // Turn on pump
+                    PUMP();
+                }
+            } else {
+                if (rem == 0) {
+                    // Call to turn valve 1 off (OPEN)
+                    digitalWrite(Pin, LOW);
+                    Serial.println(input);
+                }
+                if (rem == 1) {
+                    // Call to turn valve 2 on (CLOSE)
+                    digitalWrite(Pin, HIGH);
+                    Serial.println(input);
+                }
+                if (rem == 2) {
+                    // Query the digital pin state
+                    Serial.println(digitalRead(relayV2));
+                }
+            }
+        }
+        input = 0;
+        Pin = 0;
+        rem = 0;
     }
 }
 
@@ -109,7 +109,7 @@ void TEMP() {
     Res[3] = analogRead(temp4);
     Res[4] = analogRead(temp5);
     digitalWrite(tempPower, LOW);
-    
+
     // Calculate temperatures
     for (int i=0; i <= 4; i++) {
         // Convert analog reading to resistance value
@@ -124,7 +124,7 @@ void TEMP() {
         steinhart -= 273.15;
         Temps[i] = steinhart;
     }
-    
+
     for (int i = 0; i <= 4; i++) {
         Serial.println(Temps[i]);
     }
@@ -133,22 +133,29 @@ void TEMP() {
 void PUMP() {
     // Begin running pump while checking the serial port. If command to stop pump
     // is received, end while loop
+    // Remember valve 1 and 2 states before pumping
+    int v1;
+    int v2;
+    v1 = digitalRead(relayV1);
+    v2 = digitalRead(relayV2);
     // Make sure Valves 1 and 2 are open
     digitalWrite(relayV1, LOW);
     digitalWrite(relayV2, LOW);
     delay(500);
     Serial.println("Pump is on");
+    String content = "";
+    char character;
     int lock = 1;
     int input;
-    String inString;
     while (lock) {
-        if (Serial.available() >0) {
-            inString = Serial.readString();
-            input = inString.toInt();
-            //Serial.flush();
-            if (input == 2) {
-                break;
-            }
+        while(Serial.available()) {
+            character = Serial.read();
+            content.concat(character);
+        }
+        input = content.toInt();
+        content = "";
+        if (input == 20) {
+            break;
         }
         delay(100);
         digitalWrite(relayPump, HIGH);
@@ -156,4 +163,8 @@ void PUMP() {
         digitalWrite(relayPump,LOW);
     }
     Serial.println("Pump is off");
+    delay(500);
+    // Revert valves back to original state before pumping
+    digitalWrite(relayV1, v1);
+    digitalWrite(relayV2, v2);
 }
