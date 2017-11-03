@@ -97,12 +97,14 @@ def init():
     statusM4 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist4))
     
     ## Misc. Global variables
-    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap, connected, relayUDOO, relayArduino, arduinoPort
+    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap, connected, relayUDOO, relayArduino, arduinoPort, VS_IP, VS_PORT
     pumpTime = 10                      ## Pump time to cycle in new sample
     DAQtime = 15                       ## Standard image acq. time in seconds
     ADC = 24
     UDP_IP = "192.168.1.14"            ## IP address to host computer
     UDP_PORT = 5005                    ## UDP Port # to host computer
+    VS_IP = "localhost"
+    VS_PORT = 9988
     MESSAGE = "Hello, BRUIE! -DHM\n"   ## Sent to server to establish connection
     ## Constants for the Steinhart-Hart NTC Equation
     tempA = 0.0021879
@@ -114,6 +116,7 @@ def init():
     batCap = 100                      ## total usable battery capacity in Ah
     connected = 0;
     arduinoPort = "/dev/ttyACM0"
+    baudRate = 19200
     relayUDOO = [relayLaser, relayTEC1, relayTEC2, relay2, relay3]
     relayArduino = [relayPump, relayV1, relayV2, relayV3]
     

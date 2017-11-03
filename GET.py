@@ -20,7 +20,7 @@ header.init()
 
 def serialRead():
     while 1:
-        tdata = ser.read()           # Wait forever for anything
+        tdata = ser.read()         # Wait forever for anything
         time.sleep(1)              # Sleep (or inWaiting() doesn't give the correct value)
         data_left = s.inWaiting()  # Get the number of characters ready to be read
         tdata += ser.read(data_left) # Do the read and combine it with the first character
