@@ -7,18 +7,16 @@ file = filepath the print command is going to print to
 """
 
 import serial
-import time
-import datetime
 
-def arduino_connect():
+def connect():
     
-    ser = serial.Serial("/dev/ttyACM1", baudrate = 9600)
+    ser = serial.Serial("/dev/ttyACM0", baudrate = 19200)
 
     ## open serial ports if closed
     if(ser.isOpen() == False):
         ser.open()
-    connected = False;        ##(this is a logical statement to make connection
-    while not connected:
-        serin     = ser.read()
-        connected = True
-    return
+
+def disconnect():
+
+    if(ser.isOpen() == True):
+        ser.close()
