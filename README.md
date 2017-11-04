@@ -98,17 +98,29 @@ pinNumber = integer value of the Digital pin number
 type = integer value of whether it is an on (1) or off (0) [might be deleted]
 
 `tempPower =` excitation voltage source for all temperature sensors
+
 `relayPump =` relay for pump and LED indicator
+
 `relayV1 =`   relay for valve 1 and LED indicator
+
 `relayV2 =`   relay for valve 2 and LED indicator
+
 `relayV3 =`   relay for valve 3 and LED indicator
+
 `LEDready =`  Green 'ready' LED indicator
+
 `LEDbusy =`   Red 'busy' LED indicator
+
 `LEDbatR =`   Red 'low battery' LED indicator
+
 `LEDbatY =`   Yellow 'medium battery' indicator
+
 `LEDbatG =`   Green 'full battery' indicator
+
 `LEDall =`    list variable of all LED pin numbers to make flashing LED's easier
+
 `LEDoff =`    When flashing LED's the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.LED(pinNumber, state)`
+
 `LEDon =`     When flashing LED's the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.LED(pinNumber, state)`
 
 The subroutines of the instrument are then split into multiple python scripts.
