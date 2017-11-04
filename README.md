@@ -41,9 +41,75 @@ Add the '__init__.py' code as cronjob to run at start up.
 
 ## Understanding the code
 
+### header.py
+
 The code is written with a single header file that establishes all global variables as well as GPIO pin numbers.
 
-All 'nomenclature' is located in this file.
+All 'nomenclature' is located in this file. Below is legend of all variable names, syntax, and descriptions.
+
+#### File Paths
+
+Syntax: 'path/goes/here'
+
+`fileFolder =' file path to where event log information will be stored
+`codeFolder =' file path to parent directory containing holOS source code
+`pumpLock =' file path to the pump lock file. This file is used as a terminator to shut the pump off.
+`camLock =' file path to the camera lock file. This file is used as a terminator to stop image acquisition.
+
+#### UDOO GPIO Pins
+
+Syntax: [pinNumber, type]
+pinNumber = integer value of the GPIO pin number
+type = integer value of whether it is an input (1) or output (0)
+NOTE: If adding a new GPIO pin, or deleting an existing one. Be sure that change is reflected in the variable 
+
+`relayLaser =` relay for laser excitation voltage
+`relayTEC1 =`  relay for TEC 1 (Peltier cooler)
+`relayTEC2 =`  relay for TEC 2 (Peltier cooler)
+`relay2 =`     general purpose relay (unused)
+`relay3 =`     general purpose relay (unused)
+`moistPower =` excitation voltage source for all moisture sensors
+`moist1 =`     signal for moisture sensor 1
+`moist2 =`     signal for moisture sensor 2
+`moist3 =`     signal for moisture sensor 3
+`moist4 =`     signal for moisture sensor 4
+`buttonPump =` signal for 'pump' button
+`buttonV1_2 =` signal for 'valve 1 and 2' button (sample side valves)
+`buttonV3 =`   signal for 'valve 3' button (reference side valve)
+`buttonQuit =` signal for 'quit' button
+`buttonDAQ =`  signal for 'DAQ' button
+`GPIO =` a list of all the above GPIO variables. This is used when the instrument initializes. All GPIO's must be 'exported' and 'defined' as either inputs or outputs. This variable makes exporting and defining simple.
+
+#### Arduino Analog Pins
+
+Syntax: pinNumber (without an 'A' in front)
+
+`tempSC =` temperature sensor for the sample chamber
+`temp1 =`  general purpose temperature sensor (when assembling the instrument. Make note of which sensor is where)
+`temp2 =`  general purpose temperature sensor (when assembling the instrument. Make note of which sensor is where)
+`temp3 =`  general purpose temperature sensor (when assembling the instrument. Make note of which sensor is where)
+`temp4 =`  general purpose temperature sensor (when assembling the instrument. Make note of which sensor is where)
+`diodeC =` laser diode current monitor
+
+#### Arduino Digital Pins
+
+Syntax: [pinNumber, state]
+pinNumber = integer value of the Digital pin number
+type = integer value of whether it is an on (1) or off (0) [might be deleted]
+
+`tempPower =` excitation voltage source for all temperature sensors
+`relayPump =` relay for pump and LED indicator
+`relayV1 =`   relay for valve 1 and LED indicator
+`relayV2 =`   relay for valve 2 and LED indicator
+`relayV3 =`   relay for valve 3 and LED indicator
+`LEDready =`  Green 'ready' LED indicator
+`LEDbusy =`   Red 'busy' LED indicator
+`LEDbatR =`   Red 'low battery' LED indicator
+`LEDbatY =`   Yellow 'medium battery' indicator
+`LEDbatG =`   Green 'full battery' indicator
+`LEDall =`    list variable of all LED pin numbers to make flashing LED's easier
+`LEDoff =`    When flashing LED's the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.LED(pinNumber, state)`
+`LEDon =`     When flashing LED's the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.LED(pinNumber, state)`
 
 The subroutines of the instrument are then split into multiple python scripts.
 
@@ -51,7 +117,7 @@ The subroutines of the instrument are then split into multiple python scripts.
 
 This script contains all modules that run a function. The modules include:
 
-```
+```python
 RUN.pump()
 RUN.powerOFF()
 RUN.EMERGENCYoff()
@@ -63,7 +129,7 @@ These modules require no inputs.
 
 When calling RUN.pump() a pump lock file must also be created by the script that calls the pump command. RUN.pump() will run the pump for however long the lock file exists. See example below:
 
-```
+```python
 import os
 import RUN
 import header
@@ -92,7 +158,7 @@ This is to be called in emergency situations. This does not wait for programs to
 
 This script contains all modules that query the status of an operation. The modules include:
 
-```
+```python
 GET.relay(relayNumber)
 GET.pump()
 GET.temp()
@@ -116,7 +182,7 @@ These thermistors have a nominal resistance of 10 kOhms at 25 degrees C. To calc
 
 This script contains all modules that set the status of an operation. The modules include:
 
-```
+```python
 SET.LED(pinNumber, state)
 SET.valve(vNumber, state)
 SET.DAQtime(daqTime)
@@ -147,7 +213,7 @@ This module energizes or de-energizes relay coils. These relays are Single Pole 
 
 This script attempts to connect to an IP address and Port Number defined in the header.py file. The IP and Port numbers are defined as the variable:
 
-```
+```python
 header.UDP_IP
 header.UDP_PORT
 ```
