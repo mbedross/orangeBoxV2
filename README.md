@@ -52,8 +52,11 @@ All 'nomenclature' is located in this file. Below is legend of all variable name
 Syntax: 'path/goes/here'
 
 `fileFolder =' file path to where event log information will be stored
+
 `codeFolder =' file path to parent directory containing holOS source code
+
 `pumpLock =' file path to the pump lock file. This file is used as a terminator to shut the pump off.
+
 `camLock =' file path to the camera lock file. This file is used as a terminator to stop image acquisition.
 
 #### UDOO GPIO Pins
@@ -64,20 +67,35 @@ type = integer value of whether it is an input (1) or output (0)
 NOTE: If adding a new GPIO pin, or deleting an existing one. Be sure that change is reflected in the variable 
 
 `relayLaser =` relay for laser excitation voltage
+
 `relayTEC1 =`  relay for TEC 1 (Peltier cooler)
+
 `relayTEC2 =`  relay for TEC 2 (Peltier cooler)
+
 `relay2 =`     general purpose relay (unused)
+
 `relay3 =`     general purpose relay (unused)
+
 `moistPower =` excitation voltage source for all moisture sensors
+
 `moist1 =`     signal for moisture sensor 1
+
 `moist2 =`     signal for moisture sensor 2
+
 `moist3 =`     signal for moisture sensor 3
+
 `moist4 =`     signal for moisture sensor 4
+
 `buttonPump =` signal for 'pump' button
+
 `buttonV1_2 =` signal for 'valve 1 and 2' button (sample side valves)
+
 `buttonV3 =`   signal for 'valve 3' button (reference side valve)
+
 `buttonQuit =` signal for 'quit' button
+
 `buttonDAQ =`  signal for 'DAQ' button
+
 `GPIO =` a list of all the above GPIO variables. This is used when the instrument initializes. All GPIO's must be 'exported' and 'defined' as either inputs or outputs. This variable makes exporting and defining simple.
 
 #### Arduino Analog Pins
@@ -85,10 +103,15 @@ NOTE: If adding a new GPIO pin, or deleting an existing one. Be sure that change
 Syntax: pinNumber (without an 'A' in front)
 
 `tempSC =` temperature sensor for the sample chamber
+
 `temp1 =`  general purpose temperature sensor (when assembling the instrument. Make note of which sensor is where)
+
 `temp2 =`  general purpose temperature sensor (when assembling the instrument. Make note of which sensor is where)
+
 `temp3 =`  general purpose temperature sensor (when assembling the instrument. Make note of which sensor is where)
+
 `temp4 =`  general purpose temperature sensor (when assembling the instrument. Make note of which sensor is where)
+
 `diodeC =` laser diode current monitor
 
 #### Arduino Digital Pins
