@@ -62,11 +62,11 @@ All 'nomenclature' is located in this file. Below is legend of all variable name
 #### UDOO GPIO Pins
 
 >Syntax: [pinNumber, type]
-
+>
 >pinNumber = integer value of the GPIO pin number
-
+>
 >type = integer value of whether it is an input (1) or output (0)
-
+>
 >NOTE: If adding a new GPIO pin, or deleting an existing one. Be sure that change is reflected in the variable 
 
 `relayLaser =` relay for laser excitation voltage
@@ -78,6 +78,12 @@ All 'nomenclature' is located in this file. Below is legend of all variable name
 `relay2 =`     general purpose relay (unused)
 
 `relay3 =`     general purpose relay (unused)
+
+`relayUDOO =`  list variable of all relay pin numbers to make shut down easier
+
+`relayUDOOoff =` When turning off all relays the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.relay(pinNumber, state)`
+
+`relayUDOOon =` When turning on all relays the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.relay(pinNumber, state)`
 
 `moistPower =` excitation voltage source for all moisture sensors
 
@@ -120,9 +126,9 @@ All 'nomenclature' is located in this file. Below is legend of all variable name
 #### Arduino Digital Pins
 
 >Syntax: [pinNumber, state]
-
+>
 >pinNumber = integer value of the Digital pin number
-
+>
 >type = integer value of whether it is an on (1) or off (0) [might be deleted]
 
 
@@ -135,6 +141,12 @@ All 'nomenclature' is located in this file. Below is legend of all variable name
 `relayV2 =`   relay for valve 2 and LED indicator
 
 `relayV3 =`   relay for valve 3 and LED indicator
+
+`relayArduino =` list variable of all relay pin numbers to make shut down easier
+
+`relayArduinoOff =` When turning off all relays the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.arduinoRelay(pinNumber, state)`
+
+`relayArduinoOn =` When turning on all relays the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.arduinoRelay(pinNumber, state)`
 
 `LEDready =`  Green 'ready' LED indicator
 
@@ -151,6 +163,78 @@ All 'nomenclature' is located in this file. Below is legend of all variable name
 `LEDoff =`    When flashing LED's the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.LED(pinNumber, state)`
 
 `LEDon =`     When flashing LED's the routine expects a `state` input variable of the same size as the `pinNumber` input variable. This establishes it. See `SET.LED(pinNumber, state)`
+
+#### Status Variables
+
+`statusLaser =` Laser status variable (0 = off, 1 = on)
+
+`statusCam =`   Camera status variable (0 = offline, 1 = online)
+
+`statusPump =`  Pump status variable (0 = off, 1 = on)
+
+`statusM1 =` Moisture sensor 1 status variable (0 = dry, 1 = wet)
+
+`statusM2 =` Moisture sensor 2 status variable (0 = dry, 1 = wet)
+
+`statusM3 =` Moisture sensor 3 status variable (0 = dry, 1 = wet)
+
+`statusM4 =` Moisture sensor 4 status variable (0 = dry, 1 = wet)
+
+`connected =` Status variable for arduino serial connection (0 = disconnected, 1 = connected) 
+
+#### Misc. Global Variables
+
+`pumpTime =` time in seconds to run the pump (to be used in automated sequences)
+
+`DAQtime =` time in seconds to acquire images (to be used in automated sequences)
+
+`ADC =` Bit rate of the ADC chip used
+
+`UDP_IP =` IP address of the host server (user's laptop) to connect to via UDP
+
+`UDP_PORT =` UDP port number to connect to
+
+`VS_IP =` IP address of the virtual server that facilitates communication to and from the arduino
+
+`VS_PORT =` Port number for the virtual server
+
+`MESSAGE =` Initializing message to be sent to user's laptop after initial UDP connection is made
+
+`rShunt =` Resistance value in Ohms, of the shunt resistor used to monitor battery state of charge (SoC)
+
+`batCap =` Total battery capacity in Whr
+
+`arduinoPort =` Port where arduino is connected
+
+`baudRate =` Baudrate for the serial connection with the arduino
+
+#### UDP Commands
+
+`udpDAQ =` Call to begin DAQ sequence
+
+`udpDAQstop =` Call to stop DAQ sequence
+
+`udpStatus =` Query of instrument status (see `GET.status()`)
+
+`udpPumpOn =` Call to turn pump on
+
+`udpPumpOff =` Call to turn pump off
+
+`udpVinletO =` Call to open inlet valve
+
+`udpVinletC =` Call to close inlet valve
+
+`udpVoutletO =` Call to open outlet valve
+
+`udpVoutletC =` Call to close outlet valve
+
+`udpVrefO =` Call to open reference valve
+
+`udpVrefC =` Call to close reference valve
+
+`udpDAQauto = `Call to run automated DAQ sequence
+
+`udpOFF =` Call to turn the instrument off
 
 The subroutines of the instrument are then split into multiple python scripts.
 

@@ -43,20 +43,20 @@ def DAQtime(daqTime):
         PRINT.event(e)
     return
 
-def relay(relayNumber, state):
+def relay(pinNumber, state):
     try:
-        for x in range(0, len(relayNumber)-1):
-            os.system('echo "%d" |sudo tee /sys/class/gpio/gpio%s/value' %(state[x], relayNumber[x]))
-            message = "GPIO Pin #%d (relay) has been set to %d" %(relayNumber[x], state[x])
+        for x in range(0, len(pinNumber)-1):
+            os.system('echo "%d" |sudo tee /sys/class/gpio/gpio%s/value' %(state[x], pinNumber[x]))
+            message = "GPIO Pin #%d (relay) has been set to %d" %(pinNumber[x], state[x])
     except Exception as e:
-        message = "Power Relay %d was unable to be set. Error is as follows:" %(relayNumber[x])
+        message = "Power Relay %d was unable to be set. Error is as follows:" %(pinNumber[x])
         PRINT.event(message)
         PRINT.event(e)
     return
 
-def arduinoRelay(relayNumber, state):
-    for x in range(0, len(relayNumber)-1):
-        Pin = GET.arduinoSyntax(relayNumber[x], state[x])
+def arduinoRelay(pinNumber, state):
+    for x in range(0, len(pinNumber)-1):
+        Pin = GET.arduinoSyntax(pinNumber[x], state[x])
         s.connect((header.VS_IP, header.VS_PORT))
         s.sendall(Pin)
         pinState = int(s.recv(1024))

@@ -82,7 +82,7 @@ def init():
         LEDon[x]  = "on"
     
     ## Status variables
-    global statusLaser, statusCam, statusPump, statusV1, statusV1, statusV2, statusV3, statusM1, statusM2, statusM3, statusM4
+    global statusLaser, statusCam, statusPump, statusM1, statusM2, statusM3, statusM4
     statusLaser = 0                  ## Laser status variable
     statusCam = 0                    ## Camera status variable
     
@@ -92,9 +92,6 @@ def init():
     
     ## Checking the status of the valve/moisture sensors requires checking the 
     ##GPIO pins associated with them
-    statusV1 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.valve1))
-    statusV2 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.valve2))
-    statusV3 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.valve3))
     statusM1 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist1))
     statusM2 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist2))
     statusM3 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist3))
@@ -110,13 +107,7 @@ def init():
     VS_IP = "localhost"
     VS_PORT = 9988
     MESSAGE = "Hello, BRUIE! -DHM\n"   ## Sent to server to establish connection
-    ## Constants for the Steinhart-Hart NTC Equation
-    tempA = 0.0021879
-    tempB = 0.0001248
-    tempC = 0.0000013624
-    Rtemp = 1500                           ## Reference Resistor value [Ohms]
-    Temp = [0, 0, 0, 0, 0]             ## Variable to store temperatures
-    Rshunt = 0.75                     ## Resistance of shunt resistor
+    rShunt = 0.75                     ## Resistance of shunt resistor
     batCap = 100                      ## total usable battery capacity in Ah
     connected = 0;
     arduinoPort = "/dev/ttyACM0"
@@ -132,30 +123,19 @@ def init():
     
     ## UDP command legend
     global comDAQ, comDAQstop, comStatus, comPumpOn, comPumpOff, comVinlet, comVoutlet, comVref, comDAQauto, comOFF
-    comDAQ = 'DHM_record'                          # Start DAQ
-    comDAQstop = 'DHM_stop'                        # Stop DAQ
-    comStatus = 'DHM_status'                       # Query for DHM status
-    comPumpOn = 'DHM_pumpOn'                       # Turn on pump
-    comPumpOff = 'DHM_pumpOff'                     # Turn off pump
-    comVinlet = 'DHM_invletValve'                  # Switch the sample chamber inlet valve
-    comVoutlet = 'DHM_outletValve'                 # Switch the sample chamber outlet valve
-    comVref = 'DHM_refValve'                       # Switch the reference channel valve
-    comDAQauto = 'DHM_auto'                        # Let DHM run its own cycle
-    comOFF = 'SYS_off'                             # Non-emergency shutdown
-    
-    ## Arduino command legend
-    global ardTemp, ardPump, ardValve1, ardValve2, ardValve3, ardLEDready, ardLEDbusy, ardLEDbatR, ardLEDbatY, ardLEDbatG, ardALLoff
-    ardTemp = "1"
-    ardPump = "2"
-    ardValve1 = "3"
-    ardValve2 = "4"
-    ardValve3 = "5"
-    ardLEDready = "6"
-    ardLEDbusy = "7"
-    ardLEDbatR = "8"
-    ardLEDbatY = "9"
-    ardLEDbatG = "10"
-    ardALLoff = "11"
+    udpDAQ = 'DHM_record'                          # Start DAQ
+    udpDAQstop = 'DHM_stop'                        # Stop DAQ
+    udpStatus = 'DHM_status'                       # Query for DHM status
+    udpPumpOn = 'DHM_pumpOn'                       # Turn on pump
+    udpPumpOff = 'DHM_pumpOff'                     # Turn off pump
+    udpVinletO = 'DHM_invletValve_open'            # Switch the sample chamber inlet valve to OPEN
+    udpVinletC = 'DHM_invletValve_close'           # Switch the sample chamber inlet valve to CLOSE
+    udpVoutletO = 'DHM_outletValve_open'           # Switch the sample chamber outlet valve to OPEN
+    udpVoutletC = 'DHM_outletValve_close'          # Switch the sample chamber outlet valve to CLOSE
+    udpVrefO = 'DHM_refValve_open'                 # Switch the reference channel valve to OPEN
+    udpVrefC = 'DHM_refValve_open'                 # Switch the reference channel valve to CLOSE
+    udpDAQauto = 'DHM_auto'                        # Let DHM run its own cycle
+    udpOFF = 'SYS_off'                             # Non-emergency shutdown
     return
     
 def touch(fname):
