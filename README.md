@@ -51,13 +51,13 @@ All 'nomenclature' is located in this file. Below is legend of all variable name
 
 Syntax: 'path/goes/here'
 
-`fileFolder =' file path to where event log information will be stored
+`fileFolder =` file path to where event log information will be stored
 
-`codeFolder =' file path to parent directory containing holOS source code
+`codeFolder =` file path to parent directory containing holOS source code
 
-`pumpLock =' file path to the pump lock file. This file is used as a terminator to shut the pump off.
+`pumpLock =` file path to the pump lock file. This file is used as a terminator to shut the pump off.
 
-`camLock =' file path to the camera lock file. This file is used as a terminator to stop image acquisition.
+`camLock =` file path to the camera lock file. This file is used as a terminator to stop image acquisition.
 
 #### UDOO GPIO Pins
 
