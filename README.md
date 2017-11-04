@@ -284,24 +284,112 @@ This is to be called in emergency situations. This does not wait for programs to
 This script contains all modules that query the status of an operation. The modules include:
 
 ```python
-GET.relay(relayNumber)
+GET.isError(dataSent, dataRecv)
+GET.arduinoSyntax(pinNumber, action)
 GET.pump()
 GET.temp()
+GET.GPIO(pinNumber)
+GET.arduinoPin(pinNumber)
 ```
 
-#### GET.relay(relayNumber)
+#### `GET.isError(dataSent, dataRecv)`
 
-This module returns a logical value as to whether a relay coil is energized or not. The relays are Normally Open (NO) and control peripheral devices. See header.py for a list of relay variables.
+This module checks with or not the action of the arduino contains an error or not. Because of the limited processing power of micro-controllers, they are not capable of error handling, which means there must be a module written to do this. To account for the fact that error definitions are dynamic (defined by developer) they are defined in this module and called on by all other routines. This makes changing error definitions easier in the future. Usage example is as follows:
+
+```python
+import GET
+
+action = 'This is the command sent to the arduino'
+response = 'This is the response sent by the arduino'
+
+Error = GET.isError(action, response)
+```
+
+If the arduino encoded an error message into its serial response, the `Error` variable will be `True`
+
+```python
+print Error
+>>>True
+```
+
+If the arduino encoded no error message, the `Error` variable will be `False`
+
+```python
+print Error
+>>>False
+```
+
+At the time this section was added, the `isError()` module cannot support multiple inupts (it can only check for errors on one action/response at a time)
+
+#### `GET.arduinoSyntax(pinNumber, action)`
+
+This module formats a given command into the expected syntax of the arduino. As with `GET.isError(...)`, syntax is relative to the developer so this module formats a call to manipulate a give digital pin in the syntax that the arduino expects. An example is as follows:
+
+```python
+import GET
+
+formattedCommand = GET.arduinoSyntax(pinNumber, action)
+```
+
+The outputted variable `formattedCommnad` will now be in the syntax expected by the arduino
 
 #### GET.pump()
 
-This module checks if the pump lock file exists (header.pumpLock). If the file exists, then the pump is on.
+This module checks if the pump lock file exists (`header.pumpLock`). If the file exists, then the pump is on. An example is as follows:
+
+```python
+import GET
+
+pumpState = GET.pump()
+```
+
+If `pumpState = 0` then the pump is off, if `pumpState = 1` then the pump is on
 
 #### GET.temp()
 
 This module checks the temperatures of the five thermistors on the instrument and returns their values (in degC) as an array.
 
-These thermistors have a nominal resistance of 10 kOhms at 25 degrees C. To calculate temperature from these Negative Temperature Correlation (NTC) thermistors, the simplified Steinhart-Hart Equation is used. The Beta value for the thermistors used in the instrument is 3470.
+These thermistors have a nominal resistance of 10 kOhms at 25 degrees C. To calculate temperature from these Negative Temperature Correlation (NTC) thermistors, the simplified Steinhart-Hart Equation is used. The Beta value for the thermistors used in the instrument is 3470. An example is as follows:
+
+```python
+import GET
+
+Temps = GET.temp()
+print Temps
+>>>[25.4, 25.3, 25.7, 25.4, 25.5]
+```
+
+In the above example, arbitrary values are shown
+
+#### `GET.GPIO(pinNumber)`
+
+This module checks the state of the GPIO pin(s) defined by `pinNumber`. It returns a state variable of the same size as `pinNumber`. An axample is as follows:
+
+```python
+import GET
+
+pinNumber = [pin1, pin2, ..., pinN]
+pinState = GET.GPIO(pinNumber)
+print pinState
+>>>[0, 1, ..., 1]
+```
+
+If `pinState[i] = 1` (ith pin in `pinNumber`), that GPIO is `HIGH`, if `pinState[i] =0`, that GPIO is `LOW` 
+
+#### `GET.arduinoPin(pinNumber)`
+
+This module checks the state of the GPIO pin(s) defined by `pinNumber`. It returns a state variable of the same size as `pinNumber`. An axample is as follows:
+
+```python
+import GET
+
+pinNumber = [pin1, pin2, ..., pinN]
+pinState = GET.GPIO(pinNumber)
+print pinState
+>>>[0, 1, ..., 1]
+```
+
+If `pinState[i] = 1` (ith pin in `pinNumber`), that digital pin is `HIGH`, if `pinState[i] =0`, that digital pin is `LOW` 
 
 ### SET.py
 
