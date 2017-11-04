@@ -49,7 +49,7 @@ All 'nomenclature' is located in this file. Below is legend of all variable name
 
 #### File Paths
 
-Syntax: 'path/goes/here'
+>Syntax: 'path/goes/here'
 
 `fileFolder =` file path to where event log information will be stored
 
@@ -61,10 +61,13 @@ Syntax: 'path/goes/here'
 
 #### UDOO GPIO Pins
 
-Syntax: [pinNumber, type]
-pinNumber = integer value of the GPIO pin number
-type = integer value of whether it is an input (1) or output (0)
-NOTE: If adding a new GPIO pin, or deleting an existing one. Be sure that change is reflected in the variable 
+>Syntax: [pinNumber, type]
+
+>pinNumber = integer value of the GPIO pin number
+
+>type = integer value of whether it is an input (1) or output (0)
+
+>NOTE: If adding a new GPIO pin, or deleting an existing one. Be sure that change is reflected in the variable 
 
 `relayLaser =` relay for laser excitation voltage
 
@@ -100,7 +103,7 @@ NOTE: If adding a new GPIO pin, or deleting an existing one. Be sure that change
 
 #### Arduino Analog Pins
 
-Syntax: pinNumber (without an 'A' in front)
+>Syntax: pinNumber (without an 'A' in front)
 
 `tempSC =` temperature sensor for the sample chamber
 
@@ -116,9 +119,12 @@ Syntax: pinNumber (without an 'A' in front)
 
 #### Arduino Digital Pins
 
-Syntax: [pinNumber, state]
-pinNumber = integer value of the Digital pin number
-type = integer value of whether it is an on (1) or off (0) [might be deleted]
+>Syntax: [pinNumber, state]
+
+>pinNumber = integer value of the Digital pin number
+
+>type = integer value of whether it is an on (1) or off (0) [might be deleted]
+
 
 `tempPower =` excitation voltage source for all temperature sensors
 
