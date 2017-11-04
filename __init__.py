@@ -1,6 +1,6 @@
 """
 Date Created:       2017.10.25
-Date Last Modified: 2017.10.25
+Date Last Modified: 2017.11.03
 Author: Manuel Bedrossian
 
 This script contains all the modules used to initialize the DHM
@@ -10,7 +10,7 @@ NOTE: The module to connect with the host via UDP is not in this script because 
 """
 
 import os
-import serial
+#import serial
 import PRINT
 try:
     import ntplib
@@ -63,18 +63,17 @@ def syncTime():
         PRINT.event(message)
     return
 
-def connectArduino(arduinoPort):
-    
-    ser = serial.Serial(arduinoPort, baudrate = 19200)
+#def connectArduino(arduinoPort   
+    #ser = serial.Serial(arduinoPort, baudrate = 19200)
 
     ## open serial ports if closed
-    if(ser.isOpen() == False):
-        ser.open()
+    #if(ser.isOpen() == False):
+     #   ser.open()
     
-    connected = False;        ##(this is a logical statement to make connection
-    while not connected:
-        serin     = ser.read()
-        message = "Arduino Connected"
-        PRINT.event(message)
-        connected = True
-    return
+    #connected = False;        ##(this is a logical statement to make connection
+    #while not connected:
+     #   serin     = ser.read()
+      #  message = "Arduino Connected"
+       # PRINT.event(message)
+        #connected = True
+    #return

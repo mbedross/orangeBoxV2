@@ -1,6 +1,6 @@
 """
 Date Created:       2016.04.06
-Date Last Modified: 2017.10.25
+Date Last Modified: 2017.11.03
 Author: Manuel Bedrossian
 
 This is a header file for the operating system for the 2nd Gen. orangeBox DHM field
@@ -65,7 +65,7 @@ def init():
     diodeC = 5                       ## laser diode sensor (arduinoHeader.h)
     # Digital Pins
     ## Syntax: pin = [pinNumber, state]
-    global tempPower, relayPump, relayV1, relayV2, relayV3, LEDready, LEDbusy, LEDbatR, LEDbatY, LEDbatG
+    global tempPower, relayPump, relayV1, relayV2, relayV3, LEDready, LEDbusy, LEDbatR, LEDbatY, LEDbatG, LEDall, LEDoff, LEDon
     tempPower = [2, 0]               ## Temp sensor power  (arduinoHeader.h)
     relayPump = [3, 0]               ## Pump   relay/LED   (arduinoHeader.h)
     relayV1 =   [4, 0]               ## Valve1 relay/LED   (arduinoHeader.h)
@@ -76,6 +76,10 @@ def init():
     LEDbatR =   [9, 0]               ## SoC   LED [Red]    (arduinoHeader.h)
     LEDbatY =   [10, 0]              ## SoC   LED [Yellow] (arduinoHeader.h)
     LEDbatG =   [11, 0]              ## SoC   LED [Green]  (arduinoHeader.h)
+    LEDall = [LEDready[0], LEDbusy[0], LEDbatR[0], LEDbatY[0], LEDbatG[0]]
+    for x in range(0, len(LEDall)-1):
+        LEDoff[x] = "off"
+        LEDon[x]  = "on"
     
     ## Status variables
     global statusLaser, statusCam, statusPump, statusV1, statusV1, statusV2, statusV3, statusM1, statusM2, statusM3, statusM4
@@ -97,7 +101,7 @@ def init():
     statusM4 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist4))
     
     ## Misc. Global variables
-    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap, connected, relayUDOO, relayArduino, arduinoPort, VS_IP, VS_PORT
+    global pumpTime, DAQtime, ADC, UDP_IP, UDP_PORT, MESSAGE, tempA, tempB, tempC, Rtemp, Temp, Rshunt, batCap, connected, relayUDOO, relayArduino, arduinoPort, VS_IP, VS_PORT, relayUDOOoff, relayUDOOon, relayArduinoOff, relayArduinoOn
     pumpTime = 10                      ## Pump time to cycle in new sample
     DAQtime = 15                       ## Standard image acq. time in seconds
     ADC = 24
@@ -118,7 +122,13 @@ def init():
     arduinoPort = "/dev/ttyACM0"
     baudRate = 19200
     relayUDOO = [relayLaser, relayTEC1, relayTEC2, relay2, relay3]
+    for x in range(0, len(relayUDOO)-1):
+        relayUDOOoff[x] = 0
+        relayUDOOon[x]  = 1
     relayArduino = [relayPump, relayV1, relayV2, relayV3]
+    for x in range(0, len(relayArduino)-1):
+        relayArduinoOff[x] = "off"
+        relayArduinoOn[x]  = "on"
     
     ## UDP command legend
     global comDAQ, comDAQstop, comStatus, comPumpOn, comPumpOff, comVinlet, comVoutlet, comVref, comDAQauto, comOFF

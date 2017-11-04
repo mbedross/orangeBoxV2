@@ -1,6 +1,6 @@
 """
 Date Created:       2017.09.11
-Date Last Modified: 2017.09.11
+Date Last Modified: 2017.11.03
 
 This script contains all executable modules that are designated as SET commands
 
@@ -15,22 +15,22 @@ SET.module(inputs)
 import PRINT
 import GET
 import os
+import socket
 import header
 header.init()
 
-def LED(pinNumber):
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+def LED(pinNumber, state):
     ## All LED's are now controlled by the Arduino 101
-    Pin = str.encode(pinNumber)
-    ser.write(Pin)
-    Message = GET.Serial()
-    if Message != pinNumber:
-        message = "Something went wrong while turnin LED %d on/off. Message from arduino is as follows:" %(pinNumber)
-        PRINT.event(message)
-        PRINT.event(Message)
-    else:
-        message = "LED %d successfully switched on/off" %(pinNumber)
-        PRINT.event(message)
-    return
+    Pin = GET.arduinoSyntax(pinNumber, state)
+    s.connect((header.VS_IP, header.VS_PORT))
+    s.sendall(Pin)
+    pinState = int(s.recv(1024))
+    s.close()
+    ## Check if pinState contains error information
+    Error = GET.isError(pinState)
+    return (Error)
 
 def DAQtime(daqTime):
     try:
@@ -55,21 +55,12 @@ def relay(relayNumber, state):
     return
 
 def arduinoRelay(relayNumber, state):
-    try:
-        for x in range(0, len(relayNumber)-1):
-            Pin = str.encode(relayNumber[x])
-            ser.write(Pin)
-            Message = GET.Serial
-            if Message != relayNumber[x]:
-                message = "Something went wrong. Arduino error is as follows:"
-                PRINT.event(message)
-                PRINT.event(Message)
-            else:
-                message = "Arduino relay %d was set to %d" %(relayNumber, state)
-                PRINT.event(mesage)
-            time.sleep(0.5)    ## Allow time for action to execute before going to bext iteration
-    except Exception as e:
-        message = "Power Relay %d was unable to be set. Error is as follows:" %(relayNumber[x])
-        PRINT.event(message)
-        PRINT.event(e)
-    return
+    for x in range(0, len(relayNumber)-1):
+        Pin = GET.arduinoSyntax(relayNumber[x], state[x])
+        s.connect((header.VS_IP, header.VS_PORT))
+        s.sendall(Pin)
+        pinState = int(s.recv(1024))
+        s.close()
+        ## Check if pinState contains error information
+        Error[x] = GET.isError(pinState)
+    return (Error)

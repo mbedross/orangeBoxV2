@@ -1,7 +1,7 @@
 """
 
 Date Created:       2017.10.09
-Date Last Modified: 2017.10.09
+Date Last Modified: 2017.11.03
 
 This script is intended to check the physical buttons of the orangeBox and execute
 the appropriate commands when pressed.
@@ -11,6 +11,7 @@ This script should be called from the main function as a subprocess
 """
 
 import RUN
+import GET
 import SET
 import time
 import header
@@ -27,9 +28,9 @@ while True:
     ## Begin checking buttons. These buttons should be normally HIGH (LOW if pushed)
     pump = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonPump))
     V1_2 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonV1_2))
-    V3 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonV3))
+    V3   = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonV3))
     Quit = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonQuit))
-    DAQ = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonDAQ))
+    DAQ  = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonDAQ))
     
     if pump == 0:
         header.touch(pumpLock)
@@ -39,28 +40,37 @@ while True:
         os.remove(pumpLock)
     
     if V1_2 == 0:
-        ## Check current status of the two valves
-        V1 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.valve1))
-        V2 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.valve2))
-        
-        if (V1 == 0 or V2 == 0):
-            vNumber = [header.valve1, header.valve2]
-            SET.valve(vNumber, 1)
+        V1 = GET.arduinoPin(header.relayV1[0])
+        V2 = GET.arduinoPin(header.relayV2[0])
+        ## If any of the valves are closed (on), then open them
+        if (V1 == 1 or V2 == 1):
+            state = ["off", "off"]
         else:
-            vNumber = [header.valve1, header.valve2]
-            SET.valve(vNumber, 0)
+            state = ["on", "on"]
+        pinNumber = [header.relayV1[0], header.relayV2[0]]
+        Error = SET.arduinoRelay(pinNumber, state)
+        if (True in Error):
+            message = "An unknown error occured when setting valve 1 and/or 2"
+            PRINT.event(message)
     
-    if V3 ==0:
-        V3 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.valve3))
+    if V3 == 0:
+        V3 = GET.arduinoPin(header.relayV3[0])
         
         if V3 == 0:
-            SET.valve(header.valve3, 1)
+            state = "on"
         else:
-            SET.valve(header.valve3, 0)
+            state = "off"
+        
+        Error = SET.arduinoRelay(header.relayV3, state)
+        if (True in Error):
+            message = "An unknown error occured when setting valve 1 and/or 2"
+            PRINT.event(message)
+            
     if Quit == 0:
         RUN.powerOFF()
     
     if DAQ == 0:
+        ## Turn busy light on
         time.sleep(2)
         vid = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonDAQ))
         if vid == 0:

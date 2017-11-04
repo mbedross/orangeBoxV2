@@ -1,7 +1,7 @@
 """
 
-Date Created: 2017.09.13
-Date Last Modified: 2017.09.13
+Date Created:       2017.09.13
+Date Last Modified: 2017.11.03
 
 This script contains all modules of type GET. These modules are meant as queries
 to current system statuses as well as to query current system time
@@ -14,18 +14,32 @@ import GET
 
 """
 
-import time
+import socket
 import header
 header.init()
 
-def serialRead():
-    while 1:
-        tdata = ser.read()         # Wait forever for anything
-        time.sleep(1)              # Sleep (or inWaiting() doesn't give the correct value)
-        data_left = s.inWaiting()  # Get the number of characters ready to be read
-        tdata += ser.read(data_left) # Do the read and combine it with the first character
-        break
-    return tdata
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+def isError(dataSent, dataRecv):
+    ## This module is to check whether or not a serial data packet from the 
+    ## arduino contains error information.
+    ## This is written as a separate module so error definitions can be changed
+    ## easily.
+    if (dataSent == dataRecv):
+        Error = False
+    else:
+        Error = True
+    return Error
+
+def arduinoSyntax(pinNumber, action):
+    if (action == "on"):
+        rem = 1
+    if (action == "off"):
+        rem = 0
+    if (action == "state"):
+        rem = 2
+    formatted = 10*pinNumber+rem
+    return (formatted)
 
 def pump():
     lock = os.path.isfile(header.pumpLock)
@@ -50,15 +64,16 @@ def temp():
     """
     return Temps
 
-def relay(relayNumber):
-    for x in range(0, len(relayNumber)-1):
-        relayState[x] = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(relayNumber[x]))
-    return (relayState)
+def GPIO(pinNumber):
+    for x in range(0, len(pinNumber)-1):
+        pinState[x] = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(pinNumber[x]))
+    return (pinState)
 
-def arduinoRelay(relayNumber):
-    for x in range(0, len(relayNumber)-1):
-        Pin = relayNumber[x] + 0.2      ## the 0.2 tells the arduino to query pin state
-        Pin = str.encode(Pin)
-        ser.write(Pin)
-        relayState[x] = serialRead()
-    return (relayState)
+def arduinoPin(pinNumber):
+    for x in range(0, len(pinNumber)-1):
+        Pin = arduinoSyntax(pinNumber[x], "state")
+        s.connect((header.VS_IP, header.VS_PORT))
+        s.sendall(Pin)
+        pinState[x] = int(s.recv(1024))
+        s.close()
+    return (pinState)

@@ -1,6 +1,6 @@
 """
 Date Created:       2017.09.10
-Date Last Modified: 2017.09.11
+Date Last Modified: 2017.11.03
 
 This script contains all executable modules that are designated as RUN commands
 
@@ -15,7 +15,6 @@ RUN.module(inputs)
 import os
 import os.path
 import time
-import math
 import PRINT
 import SET
 import header
@@ -32,19 +31,28 @@ def pump():
                  
     """
     
-    SET.arduinoRelay(header.relayPump[0])
-    header.relayPump[1] = 1
-    (message) = GET.serial()
-    PRINT.event(message)
+    Error = SET.arduinoRelay(header.relayPump[0], "on")
+    if (Error == False):
+        header.relayPump[1] = 1
+        message = "Pump is now on"
+        PRINT.event(message)
+    else:
+        message = "Unknown error occured when trying to turn pump on"
+        PRINT.event(message)
+    
+    ## Loop over lock file until it is deleted
     lock = True
-
     while lock != False:
         lock = os.path.isfile(header.pumpLock)
         
-    SET.arduinoRelay(header.relayPump[0])
-    header.relayPump[1] = 0
-    (message) = GET.serial()
-    PRINT.event(message)
+    Error = SET.arduinoRelay(header.relayPump[0], "off")
+    if (Error == False):
+        header.relayPump[1] = 1
+        message = "Pump is now off"
+        PRINT.event(message)
+    else:
+        message = "Unknown error occured when trying to turn pump off"
+        PRINT.event(message)
     return
 
 def rampLaserUP():
@@ -91,8 +99,8 @@ def powerOFF():
     ## Ramp down laser
     rampLaserDown()
     ## Make sure all valves and power relays are off (valves are normally open)
-    state = 0
-    SET.powerRelay("all", state)
+    SET.relay(header.relayUDOO, header.relayUDOOoff)
+    SET.arduinoRelay(header.relayArduino, header.relayArduinoOff)
     
     message = "Non-emergency shut down"
     PRINT.event(message)
