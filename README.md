@@ -250,34 +250,41 @@ RUN.EMERGENCYoff()
 
 These modules require no inputs.
 
-#### RUN.pump()
+#### `RUN.powerOFF()`
 
-When calling RUN.pump() a pump lock file must also be created by the script that calls the pump command. RUN.pump() will run the pump for however long the lock file exists. See example below:
+This shuts down the instrument in a routine way. (non-emergency shut down). See the module for more detail but this ends all subprocesses, makes sure all peripheral devices are off (laser, pump, valves, etc.), and sends a confirmation message via UDP that shut down is occurring. It then waits 5 seconds before shutting itself down. An example is as follows:
+
+```python
+import RUN
+
+RUN.powerOFF()
+```
+
+#### `RUN.EMERGENCYoff()`
+
+This is to be called in emergency situations. This does not wait for programs to quit nor does it go through regular shut down procedures like making sure the valves and laser are off.An example is as follows:
+
+```python
+import RUN
+
+RUN.EMERGENCYoff()
+```
+
+### runPump.py
+
+When calling runPump.py a lock file must also be created by the script that calls the pump command. RUN.pump() will run the pump for however long the lock file exists. An example is as follows:
 
 ```python
 import os
-import RUN
+import subprocess
 import header
-
 header.init()
 
-def touch(fname, times=None):
-    with open(fname, 'a'):
-        os.utime(fname, times)
-    return
-
-touch(header.pumpLock)         ## Create lock file
-RUN.pump()
-os.remove(header.pumpLock)     ## Remove lock file
+header.touch(header.pumpLock)         ## Create lock file
+Pump = subprocess.Popen(["sudo","%s/runPump.py" % (header.codeFolder)])
+## After some time...
+os.remove(header.pumpLock)            ## Remove lock file
 ```
-
-#### RUN.powerOFF()
-
-This shuts down the instrument in a routine way. (non-emergency shut down). See the module for more detail but this ends all subprocesses, makes sure all peripheral devices are off (laser, pump, valves, etc.), and sends a confirmation message via UDP that shut down is occurring. It then waits 5 seconds before shutting itself down.
-
-#### RUN.EMERGENCYoff()
-
-This is to be called in emergency situations. This does not wait for programs to quit nor does it go through regular shut down procedures like making sure the valves and laser are off.
 
 ### GET.py
 
@@ -333,7 +340,7 @@ formattedCommand = GET.arduinoSyntax(pinNumber, action)
 
 The outputted variable `formattedCommnad` will now be in the syntax expected by the arduino
 
-#### GET.pump()
+#### `GET.pump()`
 
 This module checks if the pump lock file exists (`header.pumpLock`). If the file exists, then the pump is on. An example is as follows:
 
@@ -345,7 +352,7 @@ pumpState = GET.pump()
 
 If `pumpState = 0` then the pump is off, if `pumpState = 1` then the pump is on
 
-#### GET.temp()
+#### `GET.temp()`
 
 This module checks the temperatures of the five thermistors on the instrument and returns their values (in degC) as an array.
 
@@ -391,34 +398,81 @@ print pinState
 
 If `pinState[i] = 1` (ith pin in `pinNumber`), that digital pin is `HIGH`, if `pinState[i] =0`, that digital pin is `LOW` 
 
-### SET.py
+### `SET.py`
 
 This script contains all modules that set the status of an operation. The modules include:
 
 ```python
 SET.LED(pinNumber, state)
-SET.valve(vNumber, state)
 SET.DAQtime(daqTime)
-SET.powerRelay(relayNumber, state)
+SET.relay(pinNumber, state)
+SET.arduinoRelay(pinNumber, state)
 ```
 
-#### SET.LED(pinNumber, state)
+#### `SET.LED(pinNumber, state)`
 
 This module is used to turn LED's on and off. For the pump and valves of the instrument, this isn't necessary. The LED's for those components are physically wired with the relay that controls them so the LED will always turn on when its respective device is on.
 
 Input variables include the LED pin number (see header.py) and desired state. state = 1 -> ON and state = 0 -> OFF
 
-#### SET.valve(vNumber, state)
+An example is as follows:
 
-This module energizes or de-energizes the relay that controls the microfluidic valves. These valves are Normally Open (NO) and so energizing the coils (state = 1) will CLOSE the valve. vNumber is the valve relay pin number (see header.py)
+```python
+import SET
+import header
+header.init()
 
-#### SET.DAQtime(daqTime)
+pinNumber = header.LEDall
+state = LEDon
+
+Error = SET.LED(pinNumber, state)
+```
+
+In this example, all LED's are being turned on. The output variable `Error` is meant for error handling. See `GET.isError()`
+
+At the moment the syntax for `state` is a string (e.g. `state = 'on'` or `state = 'off'`), but this will most likely change to binary integer values (0 or 1) in the future.
+
+#### `SET.DAQtime(daqTime)`
 
 This module sets the length of time that DAQ will occur. The camera is controlled by a lock file so this module changes the time variable that is used to touch and remove the camera lock file.
 
-#### SET.powerRelay(relayNumber, state)
+THIS MODULE HAS YET TO BE WRITTEN
 
-This module energizes or de-energizes relay coils. These relays are Single Pole Dual Throw (SPDT). There is one common, one Normally Open (NO), and one Normally Closed (NC) lead. Energizing the coil (state = 1) completes the circuit between the common and NC lead.
+#### `SET.GPIO(pinNumber, state)`
+
+This module sets the GPIO pin(s) defined by `pinNumber` to the corresponding state defined by `state`
+
+The syntax for `state` is integer binary (0 for LOW, 1 for HIGH). An example is as follows:
+
+```python
+import SET
+import header
+header.init()
+
+pinNumber = header.relayTEC2
+state = 0
+Error = SET.GPIO(pinNumber, state)
+```
+
+In the above example, the GPIO pin that controls the relay for the #2 TEC Peltier cooler is being turned off. The output variable `Error` is intended for error handling. See `GET.isError()`
+
+#### `SET.arduinoPin(pinNumber, state)
+
+This module sets the arduino digital pin(s) defined by `pinNumber` to the corresponding state defined by `state`
+
+At the moment the syntax for `state` is a string (e.g. `state = 'on'` or `state = 'off'`), but this will most likely change to binary integer values (0 or 1) in the future. An example is as follows:
+
+```python
+import SET
+import header
+header.init()
+
+pinNumber = header.relayV1
+state = 'off'
+Error = SET.arduinoPin(pinNumber, state)
+```
+
+In the above example, the digital pin that controls the relay for the #1 valve is being turned off. The output variable `Error` is intended for error handling. See `GET.isError()`
 
 ### MAIN.py
 
