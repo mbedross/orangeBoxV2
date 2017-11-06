@@ -47,6 +47,7 @@ void loop() {
             character = Serial.read();
             content.concat(character);
         }
+        checkDiodeC();
         input = content.toInt();
         content = "";
         Pin = input / 10;
@@ -93,6 +94,20 @@ void loop() {
         input = 0;
         Pin = 0;
         rem = 0;
+    }
+}
+
+void checkDiodeC() {
+    float current;
+    current = analogRead(diodeC);
+    // Convert the ADC value to voltage with a reference of 3.3V
+    current = (current/1024)*3.3;
+    // Per laser driver spec. 10mV = 1mA
+    current = current/10;
+    // current is now in units of mA. Laser diode current cannot be more than 60 mA
+    if (current >= 60) {
+        Serial.print("Laser cuurent too high");
+        Serial.println(current);
     }
 }
 
