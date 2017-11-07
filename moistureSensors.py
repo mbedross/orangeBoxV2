@@ -11,7 +11,7 @@ This script should be called as a subprocess by the main python function
 
 """
 
-import RUN
+import kill
 import PRINT
 import os
 import time
@@ -27,11 +27,11 @@ while True:
     header.statusM3 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist3))
     header.statusM4 = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.moist4))
     os.system('echo 0 > /sys/class/gpio/gpio%d/value' %(header.moistPower))
-    time.sleep(1)
     if (
             header.moist1 == 1 or header.moist2 == 1 or
             header.moist3 == 1 or header.moist4 == 1
         ):
         message = "Moisture detected. Sensor statuses are: %d, %d, %d, %d emergency shut off now" %(header.statusM1, header.statusM2, statusM3, header.statusM4)
         PRINT.emergency(message)
-        RUN.EMERGENCYoff()
+        kill.EMERGENCY()
+    time.sleep(1)

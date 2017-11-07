@@ -16,6 +16,7 @@ import PRINT
 import RUN
 import SET
 import __init__
+import kill
 import header
 header.init()
 
@@ -151,4 +152,4 @@ if header.connect == 1:
             auto_run()
         
         if z in data: # Non-emergency shutdown
-            power_off()
+            kill.me("now")

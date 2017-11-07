@@ -10,11 +10,11 @@ This script should be called from the main function as a subprocess
 
 """
 
-import RUN
 import GET
 import SET
 import time
 import subprocess
+import kill
 import header
 header.init()
 
@@ -69,7 +69,7 @@ while True:
             PRINT.event(message)
             
     if Quit == 0:
-        RUN.powerOFF()
+        kill.me("now")
     
     if DAQ == 0:
         ## Turn busy light on
