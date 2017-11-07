@@ -14,6 +14,7 @@ import RUN
 import GET
 import SET
 import time
+import subprocess
 import header
 header.init()
 
@@ -33,8 +34,9 @@ while True:
     DAQ  = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonDAQ))
     
     if pump == 0:
+        ## No need to check whether the sample side valves are open, the arduino does that
         header.touch(pumpLock)
-        RUN.pump()
+        subprocess.Popen(["sudo","%s/runPump.py" % (header.codeFolder)])
         while pump == 0:
             pump = os.system('cat |sudo tee /sys/class/gpio/gpio%s/value' %(header.buttonPump))
         os.remove(pumpLock)

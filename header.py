@@ -77,9 +77,13 @@ def init():
     LEDbatY =   [10, 0]              ## SoC   LED [Yellow] (arduinoHeader.h)
     LEDbatG =   [11, 0]              ## SoC   LED [Green]  (arduinoHeader.h)
     LEDall = [LEDready[0], LEDbusy[0], LEDbatR[0], LEDbatY[0], LEDbatG[0]]
+    arduinoAll = [relayPump[0], relayV1[0], relayV2[0], relayV3[0], LEDready[0], LEDbusy[0], LEDbatR[0], LEDbatY[0], LEDbatG[0]]
     for x in range(0, len(LEDall)-1):
         LEDoff[x] = "off"
         LEDon[x]  = "on"
+    for x in range(0, len(arduinoAll)-1):
+        arduinoAllOff[x] = "off"
+        arduinoAllOn[x]  = "on"
     
     ## Status variables
     global statusLaser, statusCam, statusPump, statusM1, statusM2, statusM3, statusM4

@@ -9,6 +9,7 @@ the host computer (if present).
 """
 
 import socket
+import time
 import subprocess
 import GET
 import PRINT
@@ -51,51 +52,73 @@ def connectUDP():
         PRINT.event(e)
     return
 
-## Initialize all GPIO pins
-__init__.exportGPIO(header.GPIO)
-__init__.defineGPIO(header.GPIO)
+def initialize():
+    """
+    Initialization protocol is as follows:
+    1. Initialize GPIO's
+    2. Monitor moisture sensors
+    3. Monitor battery state of charge
+    4. Establish virtual server to arduino
+    5. Flash all LED's a few times (as diagnostic to make sure LED's work)
+    6a. Try to connect to host via UDP
+    6b. If connected to UDP server, sync time
+    7. Turn on/ramp up laser
+    8. Monitor external buttons
+    9. Check if camera is connected (TO BE WRITTEN)
+    """
+    
+    ## Initialize all GPIO pins
+    __init__.exportGPIO(header.GPIO)
+    __init__.defineGPIO(header.GPIO)
 
-## Establish Serial Connection with Arduino 101
-__init__.connectArduino(header.arduinoPort)
+    ## Begin monitoring moisture sensors
+    ## This is called by a subprocess in order to run in the background
+    Moist = subprocess.Popen(["sudo","%s/moistureSensors.py" % (header.codeFolder)])
 
-if header.connected == 1:
-    ## If UDP connection is established, sync CPU time with host server
-    __init__.syncTime()
+    ## Begin monitoring battery State of Charge (SoC)
+    ## This is called by a subprocess in order to run in the background
+    Battery = subprocess.Popen(["sudo","%s/batteryStatus.py" % (header.codeFolder)])
 
+    ## Establish virtual server that will facilitate communication to/from arduino
+    Ser = subprocess.Popen(["sudo","%s/SERIAL.py" % (header.codeFolder)])
 
-## Turn on the 'busy' LED to let user(s) know start has begun
-SET.LED(header.LEDbusy[0])
-## Update LEDbusy state to 1
-header.LEDbusy[1] = 1
+    ## Flash all LED's
+    for x in range(1, 3):
+        SET.arduinoPin(header.arduinoAll, header.arduinoAllOn)
+        time.sleep(0.5)
+        SET.arduinoPin(header.arduinoAll, header.arduinoAllOff)
 
-## Begin monitoring moisture sensors
-## This is called by a subprocess in order to run in the background
-Moist = subprocess.Popen(["sudo","%s/moistureSensors.py" % (header.codeFolder)])
+    ## Turn the busy LED and resume start-up
+    SET.arduinoPin(LEDbusy, "on")
 
-## Begin monitoring battery State of Charge (SoC)
-## This is called by a subprocess in order to run in the background
-Battery = subprocess.Popen(["sudo","%s/batteryStatus.py" % (header.codeFolder)])
+    ## Try to connect to the host computer via UDP
+    connectUDP()
 
-## Begin monitoring physical operation buttons
-## This is called by a subprocess in order to run in the background
-Buttons = subprocess.Popen(["sudo","%s/checkButtons.py" % (header.codeFolder)])
+    if header.connected == 1:
+        ## If UDP connection is established, sync CPU time with host server
+        __init__.syncTime()
 
-## Try to connect to UDP host
-connectUDP()
+    ## Turn the laser on and ramp it up to nominal operating conditions
+    SET.GPIO(header.laserRelay, 1)
+    RUN.rampLaserUP()
 
-## Syncronize time with Host server
-__init__.syncTime()
+    ## Begin monitoring physical operation buttons
+    ## This is called by a subprocess in order to run in the background
+    Buttons = subprocess.Popen(["sudo","%s/checkButtons.py" % (header.codeFolder)])
+    
+    """
+    TO BE WRITTEN!!!
+    
+    Check if camera is connected
+    """
 
-## Turn the laser on and ramp it up to nominal operating conditions
-SET.powerRelay(header.laserRelay, 1)
-RUN.rampLaserUP()
-## Begin monitoring laser diode current
-## This is called by a subprocess in order to run in the background
-Laser = subprocess.Popen(["sudo","%s/laserCurrent.py" % (header.codeFolder)])
+    ## System initialization is now complete. Turn the 'ready light' on
+    SET.arduinoPin(header.LEDbusy[0], "off")
+    SET.arduinoPin(header.LEDready[0], "on")
+return
 
-## System initialization is now complete. Turn the 'ready light' on
-SET.LED(header.LEDbusy, 0)
-SET.LED(header.LEDready, 1)
+## Create object for serial communication to arduino
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 if header.connect == 1:
     ## If header.connect = 1, then the DHM successfully connected to the host server via UDP so it will now listen for commands
@@ -129,5 +152,3 @@ if header.connect == 1:
         
         if z in data: # Non-emergency shutdown
             power_off()
-else:
-    return

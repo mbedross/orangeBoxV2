@@ -101,14 +101,9 @@ def powerOFF():
     ## Make sure all valves and power relays are off (valves are normally open)
     SET.relay(header.relayUDOO, header.relayUDOOoff)
     SET.arduinoRelay(header.relayArduino, header.relayArduinoOff)
-    
+    __init__.unexportGPIO(header.GPIO)
     message = "Non-emergency shut down"
     PRINT.event(message)
-    PRINT.udp(message)
-    
-    ## wait for 5 seconds
-    time.sleep(5)
-    
     # Shut down
     os.system('shutdown -P now')
     return

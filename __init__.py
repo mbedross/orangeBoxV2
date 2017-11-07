@@ -10,7 +10,6 @@ NOTE: The module to connect with the host via UDP is not in this script because 
 """
 
 import os
-#import serial
 import PRINT
 try:
     import ntplib
@@ -32,6 +31,12 @@ def exportGPIO(pins):
         except Exception as e:
             message = "GPIO pin export failed.\n", e
             PRINT.event(message)
+    if 'e' in locals():
+        message = 'There was an error when exporting all GPIOs, check previous events'
+        PRINT.event(message)
+    else:
+        message = 'All GPIO pins were exported successfully'
+        PRINT.event(message)
     return
 
 def defineGPIO(pins):
@@ -49,6 +54,34 @@ def defineGPIO(pins):
         except Exception as e:
             message = "GPIO pin definition failed.\n", e
             PRINT.event(message)
+    if 'e' in locals():
+        message = 'There was an error while defining all GPIOs, check previous events'
+        PRINT.event(message)
+    else:
+        message = 'All GPIO pins were defined successfully'
+        PRINT.event(message)
+    return
+
+def unexportGPIO(pins):
+    """
+    REMOVE AFTER DEBUGGING: The call might be...
+    os.system('echo %d > /sys/class/gpio/unexport' %(header.XYZ))
+    """
+    ## This module exports all GPIO pins to be used
+    for x in range(0, len(pins)-1):
+        try:
+            ## Export xth GPIO pin
+            temp = pins[x]
+            os.system('echo "%d" |sudo tee /sys/class/gpio/unexport' %(temp[0]))
+        except Exception as e:
+            message = "GPIO pin unexport failed.\n", e
+            PRINT.event(message)
+    if 'e' in locals():
+        message = 'There was an error when unexporting all GPIOs, check previous events'
+        PRINT.event(message)
+    else:
+        message = 'All GPIO pins were unexported successfully'
+        PRINT.event(message)
     return
 
 def syncTime():
@@ -62,18 +95,3 @@ def syncTime():
         message = "Could not sync time with host server. Error is as follows:\n", e
         PRINT.event(message)
     return
-
-#def connectArduino(arduinoPort   
-    #ser = serial.Serial(arduinoPort, baudrate = 19200)
-
-    ## open serial ports if closed
-    #if(ser.isOpen() == False):
-     #   ser.open()
-    
-    #connected = False;        ##(this is a logical statement to make connection
-    #while not connected:
-     #   serin     = ser.read()
-      #  message = "Arduino Connected"
-       # PRINT.event(message)
-        #connected = True
-    #return

@@ -21,17 +21,6 @@ header.init()
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-def LED(pinNumber, state):
-    ## All LED's are now controlled by the Arduino 101
-    Pin = GET.arduinoSyntax(pinNumber, state)
-    s.connect((header.VS_IP, header.VS_PORT))
-    s.sendall(Pin)
-    pinState = int(s.recv(1024))
-    s.close()
-    ## Check if pinState contains error information
-    Error = GET.isError(pinState)
-    return (Error)
-
 def DAQtime(daqTime):
     try:
         header.DAQtime = daqTime
